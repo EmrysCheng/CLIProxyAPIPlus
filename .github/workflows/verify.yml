@@ -1,0 +1,85 @@
+name: Verify integrated candidate
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  portable:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            target: windows/amd64
+          - runner: ubuntu-24.04
+            target: linux/amd64
+          - runner: ubuntu-24.04-arm
+            target: linux/arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    env:
+      PYTHONUTF8: '1'
+      GOMAXPROCS: '4'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: '1.26.10'
+          cache: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Hydrate exact locked upstream snapshots
+        run: python scripts/hydrate_upstreams.py
+      - run: python scripts/project.py build --target ${{ matrix.target }}
+      - run: python scripts/project.py test-e2e
+      - run: python scripts/project.py test-update
+      - run: python scripts/project.py test-source
+      - run: python scripts/project.py test-source-build
+      - run: python scripts/project.py test-web
+      - run: python scripts/regression.py
+      - run: python scripts/smoke_binary.py
+      - run: python scripts/smoke_maintenance.py
+      # No binaries/source archives until redistribution and release approval.
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: validation-metadata-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            dist/*/build-info.json
+            dist/*/checksums.txt
+          if-no-files-found: error
+  linux-full:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: '1.26.10'
+          cache: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Hydrate exact locked upstream snapshots
+        run: python scripts/hydrate_upstreams.py
+      - run: python scripts/project.py build --variant full --target linux/amd64
+      - run: python scripts/regression.py --race
+      - run: python scripts/regression.py --all-upstream
+      - run: python scripts/smoke_binary.py --binary dist/linux-amd64-full/cliproxyapi-plus

@@ -1,0 +1,614 @@
+[
+  {
+    "path": "apps/manager-server/internal/collector/auth_snapshot.go",
+    "sha256": "4888119d98f297c85c0b3144b5d57978be571c1e20c988481719cbf77530ca85",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/cpatransport\"",
+        "count": 1
+      },
+      {
+        "find": "&http.Client{Timeout: 5 * time.Second}",
+        "replace": "cpatransport.NewClient(5 * time.Second)",
+        "count": 1
+      },
+      {
+        "find": "http.DefaultClient",
+        "replace": "cpatransport.NewClient(0)",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/httpqueue/client.go",
+    "sha256": "c2f16a1eec64dab18948411b810a622b0f49569bc37543c027fa11f8c8fe2d74",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/cpatransport\"",
+        "count": 1
+      },
+      {
+        "find": "&http.Client{Timeout: 30 * time.Second}",
+        "replace": "cpatransport.NewClient(30 * time.Second)",
+        "count": 1
+      },
+      {
+        "find": "http.DefaultClient",
+        "replace": "cpatransport.NewClient(0)",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/service/cpa/client.go",
+    "sha256": "7bcb85ea786d07005d054db75f6ff78acca5569f5e4d148089f1ec7d472a79bc",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/cpatransport\"",
+        "count": 1
+      },
+      {
+        "find": "&http.Client{Timeout: 30 * time.Second}",
+        "replace": "cpatransport.NewClient(30 * time.Second)",
+        "count": 5
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/service/cpaauthfiles/client.go",
+    "sha256": "d458b123df13fe8090366d1157efc96a2489560c61d290f884f671ea693b76c1",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/cpatransport\"",
+        "count": 1
+      },
+      {
+        "find": "http.DefaultClient",
+        "replace": "cpatransport.NewClient(0)",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/service/accountaction/service.go",
+    "sha256": "fff0dac77946239089757d230682e8a6bbf5f11e0723bb02f8f451224f804a8f",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/cpatransport\"",
+        "count": 1
+      },
+      {
+        "find": "&http.Client{Timeout: 30 * time.Second}",
+        "replace": "cpatransport.NewClient(30 * time.Second)",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/service/codexinspection/service.go",
+    "sha256": "2f157f479b8cee148af2f32723c3761b493d7c485c74ad0ed9a465691e493558",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/cpatransport\"",
+        "count": 1
+      },
+      {
+        "find": "&http.Client{Timeout: 30 * time.Second}",
+        "replace": "cpatransport.NewClient(30 * time.Second)",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/worker/rate_limit_auto_disable.go",
+    "sha256": "b93fdd8cf4abe0bf7287f630bf05dab7ecd4b687e831c67b296eb40f898fa25e",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/cpatransport\"",
+        "count": 1
+      },
+      {
+        "find": "&http.Client{Timeout: quotaAutoDisableActionTimeout}",
+        "replace": "cpatransport.NewClient(quotaAutoDisableActionTimeout)",
+        "count": 1
+      },
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go w.run(ctx)",
+        "replace": "lifecycle.GoOnce(ctx,w, func(){ w.run(ctx) })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/worker/account_action_candidate.go",
+    "sha256": "9e2626ca1d4a8c0bd7d3a9b16d943726446400b57aa839c94fcb425e7dc0ee08",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/cpatransport\"",
+        "count": 1
+      },
+      {
+        "find": "http.DefaultClient",
+        "replace": "cpatransport.NewClient(0)",
+        "count": 1
+      },
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go w.run(ctx)",
+        "replace": "lifecycle.GoOnce(ctx,w, func(){ w.run(ctx) })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/service/proxy/service.go",
+    "sha256": "e1df77982358364f3b3ef5b85a1abaa07c73e7bab4dfdc05849edc1f2f70ce34",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/cpatransport\"",
+        "count": 1
+      },
+      {
+        "find": "proxy := httputil.NewSingleHostReverseProxy(target)",
+        "replace": "proxy := httputil.NewSingleHostReverseProxy(target)\n\tproxy.Transport = cpatransport.Transport()",
+        "count": 2
+      }
+    ]
+  },
+  {
+    "path": "apps/web/src/services/api/version.ts",
+    "sha256": "a6c58bf7c907460199f567d71c4b04d6ea893a77a6b8e5af011f0abc317cd061",
+    "operations": [
+      {
+        "find": "export const versionApi = {",
+        "replace": "const embeddedProduct = import.meta.env.VITE_CPA_PLUS_EMBEDDED === '1';\nconst embeddedUpdateError = () => new Error('Use CLIProxyAPIPlus product releases; standalone upgrades are disabled.');\n\nexport const versionApi = {",
+        "count": 1
+      },
+      {
+        "find": "checkLatest: () => apiClient.get<Record<string, unknown>>('/latest-version'),",
+        "replace": "checkLatest: () => embeddedProduct ? Promise.reject(embeddedUpdateError()) : apiClient.get<Record<string, unknown>>('/latest-version'),",
+        "count": 1
+      },
+      {
+        "find": "checkManagerUpdateIndex: async () => {",
+        "replace": "checkManagerUpdateIndex: async () => {\n    if (embeddedProduct) throw embeddedUpdateError();",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/cmd/cpa-manager-plus/main.go",
+    "sha256": "f2d8189f56762373d29e676bf30f9ac7dd7c97bc056b6337486ffb0a0a63206e",
+    "operations": [
+      {
+        "find": "func runServer() {\n\tcfg, err := config.Load()\n\tif err != nil {\n\t\tlog.Fatalf(\"load config: %v\", err)\n\t}\n\tdatabaseLock, err := processlock.Acquire(cfg.DBPath)\n\tif err != nil {\n\t\tlog.Fatalf(\"acquire manager database process lock: %v\", err)\n\t}\n\tdefer func() {\n\t\tif err := databaseLock.Close(); err != nil {\n\t\t\tlog.Printf(\"close manager database process lock: %v\", err)\n\t\t}\n\t}()\n\tcfg.DBPath = databaseLock.DatabasePath()\n\tif err := sqliterepo.RequireExistingDataKeyForEncryptedCPAConnection(\n\t\tcontext.Background(),\n\t\tcfg.DBPath,\n\t\tcfg.DataKey,\n\t\tcfg.DataKeyPath,\n\t); err != nil {\n\t\tlog.Fatalf(\"validate data key availability: %v\", err)\n\t}\n\tdataKey, dataKeyCreated, err := security.LoadOrCreateDataKey(cfg.DataKey, cfg.DataKeyPath)\n\tif err != nil {\n\t\tlog.Fatalf(\"load data key: %v\", err)\n\t}\n\tprotector, err := security.NewProtector(dataKey)\n\tif err != nil {\n\t\tlog.Fatalf(\"initialize secret protector: %v\", err)\n\t}\n\tdb, err := store.Open(cfg.DBPath, protector)\n\tif err != nil {\n\t\tlog.Fatalf(\"open sqlite: %v\", err)\n\t}\n\tdefer func() {\n\t\tif err := db.Close(); err != nil {\n\t\t\tlog.Printf(\"close sqlite: %v\", err)\n\t\t}\n\t}()\n\n\tbootstrapResult, err := bootstrapservice.Run(context.Background(), cfg, db, dataKeyCreated)\n\tif err != nil {\n\t\tlog.Fatalf(\"bootstrap manager server: %v\", err)\n\t}\n\tif bootstrapResult.GeneratedAdminKey != \"\" {\n\t\tlog.Printf(\"CPA Manager Plus admin key generated: %s\", bootstrapResult.GeneratedAdminKey)\n\t} else {\n\t\tlog.Printf(\"CPA Manager Plus admin credential initialized\")\n\t}\n\tif bootstrapResult.DataKeyCreated {\n\t\tlog.Printf(\"CPA Manager Plus data key created at %s\", cfg.DataKeyPath)\n\t}\n\tif bootstrapResult.MigratedLegacy {\n\t\tlog.Printf(\"CPA Manager Plus legacy data migrated\")\n\t}\n\n\tmanager := collector.NewManager(cfg, db)\n\tcollectorService := collectorservice.New(manager)\n\tcollectorWorker := worker.NewCollectorWorker(cfg, db, collectorService)\n\tctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)\n\tdefer stop()\n\twalMaintenance, err := sqliterepo.NewWALMaintenance(cfg.DBPath)\n\tif err != nil {\n\t\tlog.Printf(\"configure SQLite WAL maintenance: %v\", err)\n\t} else {\n\t\twalMaintenance.Start(ctx)\n\t\tdefer func() {\n\t\t\tif err := walMaintenance.Close(); err != nil {\n\t\t\t\tlog.Printf(\"close SQLite WAL maintenance: %v\", err)\n\t\t\t}\n\t\t}()\n\t}\n\n\tserverApp := httpapi.New(cfg, db, manager)\n\tserverApp.AppContext().DatabaseMaintenance = walMaintenance\n\trecoveryCtx, cancelRecovery := context.WithTimeout(context.Background(), 10*time.Second)\n\tif err := serverApp.AppContext().CodexInspectionService.Recover(recoveryCtx); err != nil {\n\t\tlog.Printf(\"recover codex inspection runs: %v\", err)\n\t}\n\tcancelRecovery()\n\tautomationSettingsService := serverApp.AppContext().AccountProcessingPolicyService\n\truntimeSettings := automationSettingsService.RuntimeSettings(ctx)\n\trateLimitAutoDisableWorker := worker.NewRateLimitAutoDisableWorkerWithMutationCoordinator(\n\t\tdb,\n\t\tserverApp.AppContext().AuthFileMutationCoordinator,\n\t\tcollector.RuntimeConfig{\n\t\t\tCPAUpstreamURL: cfg.CPAUpstreamURL,\n\t\t\tManagementKey:  cfg.ManagementKey,\n\t\t},\n\t)\n\tserverApp.AppContext().QuotaCooldownRecoveryService = rateLimitAutoDisableWorker\n\taccountActionWorker := worker.NewAccountActionCandidateWorkerWithMutationCoordinator(\n\t\tdb,\n\t\tserverApp.AppContext().AuthFileMutationCoordinator,\n\t\truntimeSettings.AccountActionsAutoDisable,\n\t)\n\taccountHistoryRollupWorker := worker.NewAccountHistoryRollupWorker(db)\n\tusageDerivedRollupWorker := worker.NewUsagePricingRollupWorker(db)\n\tserverApp.AppContext().ModelPriceService.SetPricesChangedNotifier(usageDerivedRollupWorker.Wake)\n\tvar usageHourlyAggregateWorker *worker.UsageHourlyAggregateWorker\n\tif cfg.DashboardHourlyRollupEnabled {\n\t\tusageHourlyAggregateWorker = worker.NewUsageHourlyAggregateWorker(db)\n\t}\n\tvar usageArchiveRetentionWorker *worker.UsageArchiveRetentionWorker\n\tif cfg.UsageArchiveRetentionEnabled && cfg.UsageArchiveRetentionDays > 0 && cfg.DashboardHourlyRollupEnabled {\n\t\tusageArchiveRetentionWorker = worker.NewUsageArchiveRetentionWorker(\n\t\t\tserverApp.AppContext().UsageService,\n\t\t\tcfg.UsageArchiveRetentionDays,\n\t\t)\n\t}\n\tserverApp.AppContext().UsageService.SetEventsInsertedNotifier(func() {\n\t\taccountHistoryRollupWorker.Wake()\n\t\tusageDerivedRollupWorker.Wake()\n\t\tif usageHourlyAggregateWorker != nil {\n\t\t\tusageHourlyAggregateWorker.Wake()\n\t\t}\n\t})\n\tautomationRuntime := worker.NewAutomationRuntime(\n\t\tautomationSettingsService,\n\t\tmanager,\n\t\trateLimitAutoDisableWorker,\n\t\taccountActionWorker,\n\t)\n\tserverApp.AppContext().AutomationRuntimeService = automationRuntime\n\tmanager.SetUsageEventHandler(worker.NewUsageEventFanout(\n\t\tautomationRuntime.UsageEventHandler(),\n\t\taccountHistoryRollupWorker,\n\t\tusageDerivedRollupWorker,\n\t\tusageHourlyAggregateWorker,\n\t))\n\n\tserver := &http.Server{\n\t\tAddr:              cfg.HTTPAddr,\n\t\tHandler:           serverApp.Handler(),\n\t\tReadHeaderTimeout: 10 * time.Second,\n\t}\n\tpprofServer, err := newPprofServer(cfg.PprofAddr)\n\tif err != nil {\n\t\tlog.Fatalf(\"configure pprof: %v\", err)\n\t}\n\tif pprofServer != nil {\n\t\tgo func() {\n\t\t\tlog.Printf(\"cpa-manager-plus pprof listening on %s\", pprofServer.Addr)\n\t\t\tif err := pprofServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {\n\t\t\t\tlog.Printf(\"pprof server: %v\", err)\n\t\t\t}\n\t\t}()\n\t}\n\n\tlistener, err := net.Listen(\"tcp\", cfg.HTTPAddr)\n\tif err != nil {\n\t\tlog.Fatalf(\"http listen: %v\", err)\n\t}\n\tlog.Printf(\"cpa-manager-plus listening on %s\", listener.Addr())\n\tcodexInspectionWorker := worker.NewCodexInspectionWorker(serverApp.AppContext().Store, serverApp.AppContext().CodexInspectionService)\n\tserverResult := make(chan error, 1)\n\tgo serveHTTPServer(server, listener, stop, serverResult)\n\tgo serverApp.AppContext().UpdateCheckService.Run(ctx)\n\tif err := serverApp.AppContext().UsageService.StartImportSessionCleanup(ctx); err != nil {\n\t\tlog.Printf(\"[startup] start usage import session cleanup: %v\", err)\n\t}\n\tif err := serverApp.AppContext().UsageService.StartArchiveJobs(ctx); err != nil {\n\t\tlog.Printf(\"[startup] start usage archive jobs: %v\", err)\n\t}\n\n\tif err := db.RunDerivedStartupMaintenance(ctx); err != nil && ctx.Err() == nil {\n\t\tlog.Printf(\"[startup] post-listen index preparation failed; continuing without blocking background workers: %v\", err)\n\t}\n\tif ctx.Err() == nil {\n\t\tlog.Printf(\"[startup] starting background workers\")\n\t\tautomationRuntime.Start(ctx)\n\t\tcodexInspectionWorker.Start(ctx)\n\t\taccountHistoryRollupWorker.Start(ctx)\n\t\tusageDerivedRollupWorker.Start(ctx)\n\t\tif usageHourlyAggregateWorker != nil {\n\t\t\tusageHourlyAggregateWorker.Start(ctx)\n\t\t}\n\t\tdb.StartDerivedMaintenance(ctx)\n\t\tcollectorWorker.Start(ctx)\n\t\tworker.NewLegacyQuotaSnapshotMigrationWorker(db).Start(ctx)\n\t}\n\n\tusageCacheAccountingMigrationWorker := worker.NewUsageCacheAccountingMigrationWorker(db, func() {\n\t\taccountHistoryRollupWorker.Wake()\n\t\tusageDerivedRollupWorker.Wake()\n\t\tif usageHourlyAggregateWorker != nil {\n\t\t\tusageHourlyAggregateWorker.Wake()\n\t\t}\n\t\tgo func() {\n\t\t\tif err := waitForUsageResponseMetadataBackfill(ctx, db); err != nil {\n\t\t\t\tif ctx.Err() == nil {\n\t\t\t\t\tlog.Printf(\"usage response metadata backfill: %v\", err)\n\t\t\t\t}\n\t\t\t\treturn\n\t\t\t}\n\t\t\tif usageArchiveRetentionWorker != nil {\n\t\t\t\tusageArchiveRetentionWorker.Start(ctx)\n\t\t\t}\n\t\t}()\n\t})\n\tif ctx.Err() == nil {\n\t\tusageCacheAccountingMigrationWorker.Start(ctx)\n\t}\n\n\tselect {\n\tcase <-ctx.Done():\n\t\tselect {\n\t\tcase err := <-serverResult:\n\t\t\tif err != nil {\n\t\t\t\tlog.Printf(\"http server stopped unexpectedly: %v\", err)\n\t\t\t}\n\t\tdefault:\n\t\t}\n\tcase err := <-serverResult:\n\t\tif err != nil {\n\t\t\tlog.Printf(\"http server stopped unexpectedly: %v\", err)\n\t\t}\n\t\t// Ensure every worker using the shared process context observes the same\n\t\t// shutdown even when the HTTP listener, rather than a signal, initiated it.\n\t\tstop()\n\t}\n\tstopCodexInspectionWorker(codexInspectionWorker, 20*time.Second)\n\tshutdownCtx, cancelShutdown := context.WithTimeout(context.Background(), 10*time.Second)\n\tdefer cancelShutdown()\n\tcollectorWorker.Stop(context.Background())\n\tif pprofServer != nil {\n\t\tif err := pprofServer.Shutdown(shutdownCtx); err != nil {\n\t\t\tlog.Printf(\"shutdown pprof: %v\", err)\n\t\t}\n\t}\n\tif err := server.Shutdown(shutdownCtx); err != nil {\n\t\tlog.Printf(\"shutdown: %v\", err)\n\t}\n\tif err := usageArchiveRetentionWorker.StopAndWait(shutdownCtx); err != nil {\n\t\tlog.Printf(\"shutdown usage archive retention: %v\", err)\n\t}\n\tif err := serverApp.AppContext().UsageService.WaitArchiveJobs(shutdownCtx); err != nil {\n\t\tlog.Printf(\"shutdown usage archive jobs: %v\", err)\n\t}\n}\n",
+        "replace": "func runServer() error {\n cfg,err:=config.Load();if err!=nil{return fmt.Errorf(\"load config: %w\",err)}\n ctx,stop:=signal.NotifyContext(context.Background(),os.Interrupt,syscall.SIGTERM);defer stop()\n return embedded.RunStandalone(ctx,cfg)\n}\n",
+        "count": 1
+      },
+      {
+        "find": "\t\"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/collector\"\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "find": "\t\"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/processlock\"\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "find": "\t\"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/security\"\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "find": "\tbootstrapservice \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/service/bootstrap\"\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "find": "\tcollectorservice \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/service/collector\"\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "find": "\t\"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/worker\"\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/pkg/embedded\"",
+        "count": 1
+      },
+      {
+        "find": "\tsqliterepo \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/repository/sqlite\"\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "find": "\trunServer()\n",
+        "replace": "\tif err:=runServer();err!=nil{log.Printf(\"manager runtime: %v\",err);os.Exit(1)}\n",
+        "count": 1
+      },
+      {
+        "find": "\t\"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/httpapi\"\n",
+        "replace": "",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/worker/account_history_rollup.go",
+    "sha256": "bc7382a49b203be49c909ae2c0fd0f842b6627c653850ff3a3ae320ceca70433",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go w.loop(ctx)",
+        "replace": "lifecycle.GoOnce(ctx,w, func(){ w.loop(ctx) })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/worker/codex_inspection_worker.go",
+    "sha256": "f007654e60d683a97fa2c440f3784c7723576af5e78d35462d8caaac9ec40f5a",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go func() {\n\t\tdefer close(done)\n\t\tw.run(workerCtx)\n\t}()",
+        "replace": "lifecycle.Go(ctx, func(){ func() {\n\t\tdefer close(done)\n\t\tw.run(workerCtx)\n\t}() })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/worker/dashboard_hourly_rollup.go",
+    "sha256": "aaf5df4072089aa5095aa7f4609068ac58b613cecaf40d7715f1c7a82a002f70",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go w.loop(ctx)",
+        "replace": "lifecycle.GoOnce(ctx,w, func(){ w.loop(ctx) })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/worker/quota_snapshot_legacy_migration.go",
+    "sha256": "4b115a39f0e3da2995806ada52e2b118c58a893131216e4c9df3ee9ea503aacf",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go w.run(ctx)",
+        "replace": "lifecycle.GoOnce(ctx,w, func(){ w.run(ctx) })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/worker/usage_archive_retention.go",
+    "sha256": "86233052d98fdfbe59ed73c1f9badf48ad63987b4a00ef55f578978d2a845a9e",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go func() {\n\t\tdefer close(done)\n\t\tdefer cancel()\n\t\tw.loop(workerCtx)\n\t}()",
+        "replace": "lifecycle.Go(ctx, func(){ func() {\n\t\tdefer close(done)\n\t\tdefer cancel()\n\t\tw.loop(workerCtx)\n\t}() })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/worker/usage_cache_accounting_migration.go",
+    "sha256": "d1b37fcc7ac1dd29844aa7db249f75a12bd00883e049c7fa07dd0f325c9269e1",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go w.run(ctx)",
+        "replace": "lifecycle.GoOnce(ctx,w, func(){ w.run(ctx) })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/worker/usage_hourly_aggregate.go",
+    "sha256": "0ea51a376a94a230da54c7f960bb445766727d843695f49164f3cae5899291f0",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go w.loop(ctx)",
+        "replace": "lifecycle.GoOnce(ctx,w, func(){ w.loop(ctx) })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/worker/usage_pricing_rollup.go",
+    "sha256": "34ade700089c5810e1f27a3ee8c3ecd9ca4076a2b3193008d927bfeb578b7eb1",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go w.loop(ctx)",
+        "replace": "lifecycle.GoOnce(ctx,w, func(){ w.loop(ctx) })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/collector/collector.go",
+    "sha256": "e09304211db646ed747c5d162c6992580ddddf561db542f08dab008e699698ed",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go runtimeHandler.UpdateRuntimeConfig(runCtx, cfg)",
+        "replace": "lifecycle.Go(ctx, func(){ runtimeHandler.UpdateRuntimeConfig(runCtx, cfg) })",
+        "count": 1
+      },
+      {
+        "find": "go m.run(runCtx, cfg)",
+        "replace": "lifecycle.Go(ctx, func(){ m.run(runCtx, cfg) })",
+        "count": 1
+      },
+      {
+        "find": "go func() {\n\t\tselect {\n\t\tcase <-ctx.Done():\n\t\t\t_ = client.SetReadDeadline(time.Now())\n\t\tcase <-done:\n\t\t}\n\t}()",
+        "replace": "lifecycle.Go(ctx, func(){ func() {\n\t\tselect {\n\t\tcase <-ctx.Done():\n\t\t\t_ = client.SetReadDeadline(time.Now())\n\t\tcase <-done:\n\t\t}\n\t}() })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/repository/sqlite/derived_cleanup.go",
+    "sha256": "9e4cf063e6c759c66d85cb95e67d35345408a484ab8ad1e562cd9e60a0576b88",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go runDerivedMaintenance(ctx, db)",
+        "replace": "lifecycle.Go(ctx, func(){ runDerivedMaintenance(ctx, db) })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/repository/sqlite/wal_maintenance.go",
+    "sha256": "33e51ba518cbf3b5dbb2d7fad39701c3c5233d42b45ffaec49266f62e5e79cab",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go func() {\n\t\tdefer m.wg.Done()\n\t\tm.runWithTimeout(ctx)\n\t\tticker := time.NewTicker(m.options.interval)\n\t\tdefer ticker.Stop()\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-ctx.Done():\n\t\t\t\treturn\n\t\t\tcase <-ticker.C:\n\t\t\t\tm.runWithTimeout(ctx)\n\t\t\t}\n\t\t}\n\t}()",
+        "replace": "lifecycle.Go(ctx, func(){ func() {\n\t\tdefer m.wg.Done()\n\t\tm.runWithTimeout(ctx)\n\t\tticker := time.NewTicker(m.options.interval)\n\t\tdefer ticker.Stop()\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase <-ctx.Done():\n\t\t\t\treturn\n\t\t\tcase <-ticker.C:\n\t\t\t\tm.runWithTimeout(ctx)\n\t\t\t}\n\t\t}\n\t}() })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/service/usage/import_session.go",
+    "sha256": "02657968a5a199f93ced94653f958af353689f1eee6ead10b0fcea963e7ebe3a",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go m.cleanupLoop(ctx, interval)",
+        "replace": "lifecycle.Go(ctx, func(){ m.cleanupLoop(ctx, interval) })",
+        "count": 1
+      },
+      {
+        "find": "go m.runImport(id, dataPath, processingCtx, importer)",
+        "replace": "lifecycle.Go(processingCtx, func(){ m.runImport(id, dataPath, processingCtx, importer) })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/internal/service/usage/archive_job.go",
+    "sha256": "0c7f1b6c2c140a48baa58e93feeeea95c1f3a872234a1e5cf98a680232e4eadf",
+    "operations": [
+      {
+        "find": "import (",
+        "replace": "import (\n \"github.com/seakee/cpa-manager-plus/apps/manager-server/internal/lifecycle\"",
+        "count": 1
+      },
+      {
+        "find": "go func() {\n\t\tdefer close(done)\n\t\trunner.loop(ctx)\n\t}()",
+        "replace": "lifecycle.Go(ctx, func(){ func() {\n\t\tdefer close(done)\n\t\trunner.loop(ctx)\n\t}() })",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/web/src/features/system/ManagerUpdatePage.tsx",
+    "sha256": "e81b26ac36e9ec10fa81c61392272a02d483430a27ea73bfb9cc1916a9a22028",
+    "operations": [
+      {
+        "find": "import { useEffect, useRef, useState } from 'react';",
+        "replace": "import { useEffect, useRef, useState } from 'react';\nimport { ProductReleasePage } from './ProductReleasePage';",
+        "count": 1
+      },
+      {
+        "find": "export function ManagerUpdatePage() {",
+        "replace": "export function ManagerUpdatePage() { return import.meta.env.VITE_CPA_PLUS_EMBEDDED === \"1\" ? <ProductReleasePage /> : <StandaloneManagerUpdatePage />; }\n\nfunction StandaloneManagerUpdatePage() {",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/web/index.html",
+    "sha256": "8f1398d425cac6c012b2b049b2ccda932de02d99450ddeaa6fc401842fa7f206",
+    "operations": [
+      {
+        "find": "<title>CPA Manager Plus</title>",
+        "replace": "<title>CLIProxyAPIPlus</title>",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/web/src/components/layout/MainLayout.tsx",
+    "sha256": "19aa5f8d2e5c06032d28c185c3444c08e3dc6681a06e05c8b602c5f00c37b003",
+    "operations": [
+      {
+        "find": "const fullBrandName = 'CPA Manager Plus';",
+        "replace": "const fullBrandName = import.meta.env.VITE_CPA_PLUS_EMBEDDED === '1' ? 'CLIProxyAPIPlus' : 'CPA Manager Plus';",
+        "count": 1
+      },
+      {
+        "find": "import { DatabaseMaintenanceBanner } from '@/components/common/DatabaseMaintenanceBanner';",
+        "replace": "import { DatabaseMaintenanceBanner } from '@/components/common/DatabaseMaintenanceBanner';\nimport { ProductUpdateNotice } from '@/features/system/ProductUpdateNotice';",
+        "count": 1
+      },
+      {
+        "find": "<DatabaseMaintenanceBanner />",
+        "replace": "{import.meta.env.VITE_CPA_PLUS_EMBEDDED === '1' && <ProductUpdateNotice />}\n            <DatabaseMaintenanceBanner />",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/web/src/features/system/ManagerUpdates.tsx",
+    "sha256": "dd5a4c93929c807bd118f1f1e6c09b0b68cc7c574ea4c3081192671cd5146f39",
+    "operations": [
+      {
+        "find": "auth && availability.managerServiceAvailable && !!base && !(__DEMO_SITE__ && isDemoMode());",
+        "replace": "import.meta.env.VITE_CPA_PLUS_EMBEDDED !== '1' &&\n      auth && availability.managerServiceAvailable && !!base && !(__DEMO_SITE__ && isDemoMode());",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/web/src/main.tsx",
+    "sha256": "3945601605b09f69d097fdbb8171a6f2a1ff19238920e902f16c31232d1ed504",
+    "operations": [
+      {
+        "find": "document.title = 'CPA Manager Plus';",
+        "replace": "document.title = import.meta.env.VITE_CPA_PLUS_EMBEDDED === '1' ? 'CLIProxyAPIPlus' : 'CPA Manager Plus';",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/manager-server/cmd/cpa-manager-plus/main_test.go",
+    "sha256": "906011ae415b572db6488e8abeeba11ed86781aa17d8f82873e020521888ea62",
+    "operations": [
+      {
+        "find": "func TestDerivedMigrationsStartAfterHTTPListenerIsBound(t *testing.T) {\n\tcontent, err := os.ReadFile(\"main.go\")\n\tif err != nil {\n\t\tt.Fatalf(\"read main.go: %v\", err)\n\t}\n\tsource := string(content)\n\tlistenAt := strings.Index(source, `net.Listen(\"tcp\", cfg.HTTPAddr)`)\n\tlisteningLogAt := strings.Index(source, `log.Printf(\"cpa-manager-plus listening on %s\", listener.Addr())`)\n\tserveAt := strings.Index(source, \"go serveHTTPServer(server, listener, stop, serverResult)\")\n\tif listenAt < 0 || listeningLogAt < listenAt || serveAt < listeningLogAt {\n\t\tt.Fatalf(\"HTTP listener ordering not found: listen=%d log=%d serve=%d\", listenAt, listeningLogAt, serveAt)\n\t}\n\tfor _, startCall := range []string{\n\t\t\"db.RunDerivedStartupMaintenance(ctx)\",\n\t\t\"automationRuntime.Start(ctx)\",\n\t\t\"codexInspectionWorker.Start(ctx)\",\n\t\t\"accountHistoryRollupWorker.Start(ctx)\",\n\t\t\"usageDerivedRollupWorker.Start(ctx)\",\n\t\t\"usageHourlyAggregateWorker.Start(ctx)\",\n\t\t\"db.StartDerivedMaintenance(ctx)\",\n\t\t\"collectorWorker.Start(ctx)\",\n\t\t\"NewLegacyQuotaSnapshotMigrationWorker(db).Start(ctx)\",\n\t\t\"usageCacheAccountingMigrationWorker.Start(ctx)\",\n\t\t\"waitForUsageResponseMetadataBackfill(ctx, db)\",\n\t\t\"usageArchiveRetentionWorker.Start(ctx)\",\n\t} {\n\t\tstartAt := strings.Index(source, startCall)\n\t\tif startAt < serveAt {\n\t\t\tt.Fatalf(\"%s starts before HTTP Serve is launched: start=%d serve=%d\", startCall, startAt, serveAt)\n\t\t}\n\t}\n\tmaintenanceAt := strings.Index(source, \"db.RunDerivedStartupMaintenance(ctx)\")\n\tcollectorAt := strings.Index(source, \"collectorWorker.Start(ctx)\")\n\tif maintenanceAt < serveAt || collectorAt < maintenanceAt {\n\t\tt.Fatalf(\"startup maintenance/collector ordering invalid: serve=%d maintenance=%d collector=%d\", serveAt, maintenanceAt, collectorAt)\n\t}\n\tmigrationWorkerAt := strings.Index(source, \"usageCacheAccountingMigrationWorker :=\")\n\tmigrationStartAt := strings.Index(source, \"usageCacheAccountingMigrationWorker.Start(ctx)\")\n\tbackfillAt := strings.Index(source, \"waitForUsageResponseMetadataBackfill(ctx, db)\")\n\tretentionAt := strings.Index(source, \"usageArchiveRetentionWorker.Start(ctx)\")\n\tif migrationWorkerAt < serveAt || migrationStartAt < migrationWorkerAt ||\n\t\tbackfillAt < migrationWorkerAt || retentionAt < backfillAt {\n\t\tt.Fatalf(\n\t\t\t\"retention readiness ordering invalid: serve=%d migration_worker=%d migration_start=%d backfill=%d retention=%d\",\n\t\t\tserveAt,\n\t\t\tmigrationWorkerAt,\n\t\t\tmigrationStartAt,\n\t\t\tbackfillAt,\n\t\t\tretentionAt,\n\t\t)\n\t}\n\tif !strings.Contains(source, \"cfg.UsageArchiveRetentionEnabled && cfg.UsageArchiveRetentionDays > 0 && cfg.DashboardHourlyRollupEnabled\") {\n\t\tt.Fatal(\"retention worker construction is not gated by explicit enablement, positive days, and hourly rollups\")\n\t}\n\tif !strings.Contains(source, \"continuing without blocking background workers\") {\n\t\tt.Fatal(\"post-listen index failure does not explicitly preserve background worker startup\")\n\t}\n}\n",
+        "replace": "func TestDerivedMigrationsStartAfterHTTPListenerIsBound(t *testing.T) {\n runtime,err:=os.ReadFile(\"../../pkg/embedded/runtime.go\");if err!=nil{t.Fatal(err)}\n standalone,err:=os.ReadFile(\"../../pkg/embedded/standalone.go\");if err!=nil{t.Fatal(err)}\n source:=string(runtime)\n readyAt:=strings.Index(source,\"ready(http.HandlerFunc(\")\n maintenanceAt:=strings.Index(source,\"db.RunDerivedStartupMaintenance(ctx)\")\n collectorAt:=strings.Index(source,\"collectorWorker.Start(ctx)\")\n if readyAt<0||maintenanceAt<readyAt||collectorAt<maintenanceAt{t.Fatal(\"shared runtime does not publish the bound handler before maintenance/workers\")}\n listener:=string(standalone)\n if !strings.Contains(listener,`net.Listen(\"tcp\", addr)`)||!strings.Contains(listener,\"case <-bound:\")||!strings.Contains(listener,\"close(bound)\"){t.Fatal(\"standalone callback does not wait for listener binding\")}\n}\n",
+        "count": 1
+      },
+      {
+        "find": "func TestManagerDatabaseProcessLockPrecedesStoreOpen(t *testing.T) {\n\tcontent, err := os.ReadFile(\"main.go\")\n\tif err != nil {\n\t\tt.Fatalf(\"read main.go: %v\", err)\n\t}\n\tsource := string(content)\n\tlockAt := strings.Index(source, \"processlock.Acquire(cfg.DBPath)\")\n\tstoreOpenAt := strings.Index(source, \"store.Open(cfg.DBPath, protector)\")\n\tlockCloseAt := strings.Index(source, \"databaseLock.Close()\")\n\tif lockAt < 0 || storeOpenAt < lockAt || lockCloseAt < lockAt {\n\t\tt.Fatalf(\"database lock ordering invalid: lock=%d open=%d close=%d\", lockAt, storeOpenAt, lockCloseAt)\n\t}\n}\n",
+        "replace": "func TestManagerDatabaseProcessLockPrecedesStoreOpen(t *testing.T) {\n raw,err:=os.ReadFile(\"../../pkg/embedded/runtime.go\");if err!=nil{t.Fatal(err)}\n source:=string(raw);lockAt:=strings.Index(source,\"processlock.Acquire(cfg.DBPath)\");openAt:=strings.Index(source,\"store.Open(cfg.DBPath, protector)\")\n if lockAt<0||openAt<lockAt||!strings.Contains(source,\"closeLock = databaseLock.Close\"){t.Fatal(\"shared runtime lock/store ownership ordering invalid\")}\n}\n",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/web/src/features/dashboard/components/VersionCard.tsx",
+    "sha256": "1eb4e2f2db6ffbcd59101d08afe15c20695961af7f68e120e811928cb9cb92a9",
+    "operations": [
+      {
+        "find": "import { Link } from 'react-router-dom';",
+        "replace": "import { Link, useNavigate } from 'react-router-dom';",
+        "count": 1
+      },
+      {
+        "find": "const { t, i18n } = useTranslation();",
+        "replace": "const { t, i18n } = useTranslation();\n  const navigate = useNavigate();",
+        "count": 1
+      },
+      {
+        "find": "if (connectionStatus === 'connected') {",
+        "replace": "if (connectionStatus === 'connected' && import.meta.env.VITE_CPA_PLUS_EMBEDDED !== '1') {",
+        "count": 1
+      },
+      {
+        "find": "const handleApiVersionCheck = useCallback(async () => {",
+        "replace": "const handleApiVersionCheck = useCallback(async () => {\n    if (import.meta.env.VITE_CPA_PLUS_EMBEDDED === '1') { navigate('/system/updates'); return; }",
+        "count": 1
+      },
+      {
+        "find": "}, [apiVersion, showNotification, t]);",
+        "replace": "}, [apiVersion, showNotification, t, navigate]);",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "apps/web/src/features/system/SystemPage.tsx",
+    "sha256": "5563b86a4810593b05ed76103da1702353812d48d081edad8873a1fc2999ceb0",
+    "operations": [
+      {
+        "find": "updates.available && (",
+        "replace": "(import.meta.env.VITE_CPA_PLUS_EMBEDDED === '1' || updates.available) && (",
+        "count": 1
+      },
+      {
+        "find": "{t('manager_updates.title')}",
+        "replace": "{import.meta.env.VITE_CPA_PLUS_EMBEDDED === '1' ? (i18n.language.startsWith('zh') ? '程序更新' : 'Application updates') : t('manager_updates.title')}",
+        "count": 1
+      }
+    ]
+  }
+]

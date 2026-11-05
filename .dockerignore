@@ -1,0 +1,10 @@
+.git
+.build
+dist
+**/node_modules
+**/__pycache__
+.data
+*.key
+config.yaml
+runtime/
+.env

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "channel": "stable",
+  "checked_at": "2026-11-04T02:19:00.443782+00:00",
+  "projects": {
+    "cliproxyapi": {
+      "repository": "router-for-me/CLIProxyAPI",
+      "ref": "v8.0.53",
+      "commit": "01b24f1f95dc9b309765212c52b25b25e005ff01",
+      "tree_sha256": "76dd8d83fc8bdc6957944682b917c2e5a2f225f7d6b140ad058bfb533bf1c9fe",
+      "legacy_windows_tree_sha256": "fa8282d80f3004a4aebb4585e80017cdfcfacafb4af462f1c8b2f9b70e3444a3"
+    },
+    "cpa-manager-plus": {
+      "repository": "seakee/CPA-Manager-Plus",
+      "ref": "v1.14.10",
+      "commit": "a67ed8834a914ab24c36d2490fa6bb6d4166724c",
+      "tree_sha256": "3eca6c13bcdafcf6321a8510f74565298faa8769b7b39b5c09283baa57ba7205",
+      "legacy_windows_tree_sha256": "f4ca4693563c5bcaaa05f2e0e118bc94db73f9aca49a03cf49560fa7fdad919a"
+    }
+  },
+  "tree_hash_format": "sha256-length-prefixed-posix-utf8-order-v2"
+}

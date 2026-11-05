@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "versions": {
+    "go": "1.26.10",
+    "node": "24.22.1",
+    "python": "3.13.18"
+  },
+  "platforms": {
+    "windows/amd64": {
+      "archives": {
+        "go": {
+          "url": "https://go.dev/dl/go1.26.10.windows-amd64.zip",
+          "sha256": "7ecd2d7260e82c59bcbd7f1077a07cee2dea607295b858df67195a1e4e09629b",
+          "size": 75004774,
+          "prefix": "go/"
+        },
+        "node": {
+          "url": "https://nodejs.org/dist/v24.22.1/node-v24.22.1-win-x64.zip",
+          "sha256": "d2046d28c2c3dcd211ac5145c0bf30e2047ef9dfb306693c8c6e2eccd8b95fa5",
+          "prefix": "node-v24.22.1-win-x64/"
+        },
+        "python": {
+          "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20261026/cpython-3.13.18%2B20261026-x86_64-pc-windows-msvc-install_only_stripped.tar.gz",
+          "sha256": "7369f7a35f261222a6ac8b3a87c1c88eeebee8af945d85346202591a64038dd3",
+          "size": 22023022,
+          "prefix": "python/"
+        },
+        "python-licenses": {
+          "url": "https://codeload.github.com/astral-sh/python-build-standalone/zip/fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+          "sha256": "215fca8db67150392cc520174b40ae0a6092eb7349934cbbd263f883018dec29",
+          "prefix": "python-build-standalone-fa506e0858ac9f2cc5b289c137b888a2aa24d1ee/",
+          "only": [
+            "LICENSE",
+            "LICENSE.bdb.txt",
+            "LICENSE.bzip2.txt",
+            "LICENSE.cpython.txt",
+            "LICENSE.expat.txt",
+            "LICENSE.libX11.txt",
+            "LICENSE.libXau.txt",
+            "LICENSE.libedit.txt",
+            "LICENSE.libffi.txt",
+            "LICENSE.liblzma.txt",
+            "LICENSE.libuuid.txt",
+            "LICENSE.libxcb.txt",
+            "LICENSE.mpdecimal.txt",
+            "LICENSE.ncurses.txt",
+            "LICENSE.openssl-3.txt",
+            "LICENSE.sqlite.txt",
+            "LICENSE.tcl.txt",
+            "LICENSE.tix.txt",
+            "LICENSE.zlib-ng.txt",
+            "LICENSE.zlib.txt",
+            "LICENSE.zstd.txt",
+            "python-licenses.rst"
+          ],
+          "format": "zip"
+        }
+      },
+      "manifest_sha256": "72eed268089dec61119cc0de0ddf998d35c96f87cd06c0da5d107032ee0da3b2"
+    },
+    "linux/amd64": {
+      "archives": {
+        "go": {
+          "url": "https://go.dev/dl/go1.26.10.linux-amd64.tar.gz",
+          "sha256": "ccfe7ae822d2c2f41f4fe7c956199967a4dac22d0ee0d2b2bfdb440aab3b20c5",
+          "size": 66936659,
+          "prefix": "go/"
+        },
+        "node": {
+          "url": "https://nodejs.org/dist/v24.22.1/node-v24.22.1-linux-x64.tar.gz",
+          "sha256": "eb6728e77c576a35162c122c45ccadf224d89ff00abc8dae46cc2897c6002d7c",
+          "prefix": "node-v24.22.1-linux-x64/"
+        },
+        "python": {
+          "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20261026/cpython-3.13.18%2B20261026-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz",
+          "sha256": "df15fe60d3ff55bf9dcf25824b5572756bb8816ff93865a273d3301d7066a8b7",
+          "size": 35395906,
+          "prefix": "python/",
+          "exclude_prefixes": [
+            "share/terminfo/"
+          ]
+        },
+        "python-licenses": {
+          "url": "https://codeload.github.com/astral-sh/python-build-standalone/zip/fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+          "sha256": "215fca8db67150392cc520174b40ae0a6092eb7349934cbbd263f883018dec29",
+          "prefix": "python-build-standalone-fa506e0858ac9f2cc5b289c137b888a2aa24d1ee/",
+          "only": [
+            "LICENSE",
+            "LICENSE.bdb.txt",
+            "LICENSE.bzip2.txt",
+            "LICENSE.cpython.txt",
+            "LICENSE.expat.txt",
+            "LICENSE.libX11.txt",
+            "LICENSE.libXau.txt",
+            "LICENSE.libedit.txt",
+            "LICENSE.libffi.txt",
+            "LICENSE.liblzma.txt",
+            "LICENSE.libuuid.txt",
+            "LICENSE.libxcb.txt",
+            "LICENSE.mpdecimal.txt",
+            "LICENSE.ncurses.txt",
+            "LICENSE.openssl-3.txt",
+            "LICENSE.sqlite.txt",
+            "LICENSE.tcl.txt",
+            "LICENSE.tix.txt",
+            "LICENSE.zlib-ng.txt",
+            "LICENSE.zlib.txt",
+            "LICENSE.zstd.txt",
+            "python-licenses.rst"
+          ],
+          "format": "zip"
+        }
+      },
+      "manifest_sha256": "bccfaf5f6e71af6e838b75a214f29f21a7ec936146e28d3d01ad1ae68eb2fe72"
+    },
+    "linux/arm64": {
+      "archives": {
+        "go": {
+          "url": "https://go.dev/dl/go1.26.10.linux-arm64.tar.gz",
+          "sha256": "3f4227ce7b206a513e794f1393adb473a07b46e94d18bd15d1c684bbb7319797",
+          "size": 63827526,
+          "prefix": "go/"
+        },
+        "node": {
+          "url": "https://nodejs.org/dist/v24.22.1/node-v24.22.1-linux-arm64.tar.gz",
+          "sha256": "33c37be234ba8bee041961047b19160f4d7d0f164e8e246f78bdd10feff148b3",
+          "prefix": "node-v24.22.1-linux-arm64/"
+        },
+        "python": {
+          "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20261026/cpython-3.13.18%2B20261026-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz",
+          "sha256": "578d9da1983463ffb0c8c98ab0da2f18177f44069328eb0af847860c1eb05c3e",
+          "size": 29492455,
+          "prefix": "python/",
+          "exclude_prefixes": [
+            "share/terminfo/"
+          ]
+        },
+        "python-licenses": {
+          "url": "https://codeload.github.com/astral-sh/python-build-standalone/zip/fa506e0858ac9f2cc5b289c137b888a2aa24d1ee",
+          "sha256": "215fca8db67150392cc520174b40ae0a6092eb7349934cbbd263f883018dec29",
+          "prefix": "python-build-standalone-fa506e0858ac9f2cc5b289c137b888a2aa24d1ee/",
+          "only": [
+            "LICENSE",
+            "LICENSE.bdb.txt",
+            "LICENSE.bzip2.txt",
+            "LICENSE.cpython.txt",
+            "LICENSE.expat.txt",
+            "LICENSE.libX11.txt",
+            "LICENSE.libXau.txt",
+            "LICENSE.libedit.txt",
+            "LICENSE.libffi.txt",
+            "LICENSE.liblzma.txt",
+            "LICENSE.libuuid.txt",
+            "LICENSE.libxcb.txt",
+            "LICENSE.mpdecimal.txt",
+            "LICENSE.ncurses.txt",
+            "LICENSE.openssl-3.txt",
+            "LICENSE.sqlite.txt",
+            "LICENSE.tcl.txt",
+            "LICENSE.tix.txt",
+            "LICENSE.zlib-ng.txt",
+            "LICENSE.zlib.txt",
+            "LICENSE.zstd.txt",
+            "python-licenses.rst"
+          ],
+          "format": "zip"
+        }
+      },
+      "manifest_sha256": "7899b33f6142157f94133f6120af2aea276659b8f8691265598e431ab3a10982"
+    }
+  }
+}

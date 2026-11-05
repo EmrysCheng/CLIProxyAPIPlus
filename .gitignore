@@ -1,0 +1,18 @@
+.build/
+.data/
+dist/
+go.work
+go.work.sum
+config.yaml
+*.exe
+__pycache__/
+logs/
+runtime/
+.env
+
+# Exact upstream trees are hydrated from upstream.lock.json, never committed.
+/upstream/
+/data/
+/data.updates/
+/auths/
+/backups/

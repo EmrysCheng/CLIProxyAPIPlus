@@ -1,0 +1,17 @@
+services:
+  cliproxyapi-plus:
+    build: .
+    image: cliproxyapi-plus:local
+    ports:
+      - "127.0.0.1:8317:8317"
+    volumes:
+      - ./runtime:/state
+    restart: unless-stopped
+    stop_grace_period: 60s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp

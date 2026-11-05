@@ -1,0 +1,62 @@
+name: Validate upstream candidate (no publishing)
+on:
+  schedule:
+    - cron: '23 3 * * *'
+  workflow_dispatch:
+    inputs:
+      channel:
+        type: choice
+        options: [stable, edge]
+        default: stable
+      project:
+        type: choice
+        options: [all, cliproxyapi, cpa-manager-plus]
+        default: all
+permissions:
+  contents: read
+concurrency:
+  group: upstream-candidate
+  cancel-in-progress: false
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      PYTHONUTF8: '1'
+      CHANNEL: ${{ inputs.channel || 'stable' }}
+      PROJECT: ${{ inputs.project || 'all' }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: '1.26.10'
+          cache: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Hydrate exact locked upstream snapshots
+        run: python scripts/hydrate_upstreams.py
+      - name: Isolated source candidate
+        run: python scripts/upstreams.py stage --channel "$CHANNEL" --project "$PROJECT"
+      - name: Validate without publishing credentials
+        shell: bash
+        run: |
+          candidate=$(find .build/candidates -mindepth 1 -maxdepth 1 -type d | head -1)
+          python scripts/upstreams.py validate --candidate "$candidate"
+      # Metadata only, including on failure; never export unapproved full source archives.
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: upstream-validation
+          path: |
+            .build/candidates/*/candidate.json
+            .build/candidates/*/validation.json
+            .build/candidates/*/source/upstream.lock.json
+          if-no-files-found: warn
+# Promotion is intentionally local/manual after review. This job has no write
+# permission, publishing secret, pull_request_target, release or deployment step.

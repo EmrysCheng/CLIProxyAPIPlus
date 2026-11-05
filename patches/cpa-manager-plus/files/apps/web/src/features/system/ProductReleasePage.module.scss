@@ -1,0 +1,54 @@
+.page {
+  width: 100%; min-width: 0; max-width: 1200px; margin: 0 auto;
+  display: grid; gap: 24px; color: var(--text-primary);
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+}
+.heading {
+  display: flex; gap: 20px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  h1 { margin: 0; font-size: 24px; line-height: 1.4; font-weight: 650; }
+  p { margin: 8px 0 0; color: var(--text-secondary); }
+}
+.bodyCard, .operationCard {
+  min-width: 0; display: grid; gap: 16px;
+  > :global(.card-header) { margin-bottom: 0; }
+  > p { margin: 0; line-height: 1.7; overflow-wrap: anywhere; }
+}
+.sourceSection { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; min-width: 0; }
+.sourceIntro, .sourceSection > .confirmation { grid-column: 1 / -1; }
+.versions {
+  display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px 16px; margin: 0;
+  dt { color: var(--text-secondary); }
+  dd { margin: 0; min-width: 0; }
+  code { display: block; margin-top: 6px; color: var(--text-secondary); }
+  span { color: var(--text-secondary); font-size: 12px; margin-left: 8px; }
+}
+.error { color: var(--color-danger, #ef4444); line-height: 1.7; overflow-wrap: anywhere; }
+.warning { border-left: 3px solid var(--warning-color, #f59e0b); background: var(--app-surface-muted); padding: 12px 14px; border-radius: 8px; line-height: 1.7; overflow-wrap: anywhere; }
+.secondaryText, .actionHint { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+.notes { white-space: pre-wrap; line-height: 1.7; }
+.asset { margin-top: 12px; code { display: block; margin-top: 6px; } }
+.page ol { padding-left: 24px; line-height: 1.9; }
+.page a:focus-visible, .page summary:focus-visible { outline: 2px solid var(--focus-border, #3b82f6); outline-offset: 3px; }
+.notice { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 20px; border-bottom: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); flex-wrap: wrap; }
+// Button owns the color of its label and loading spinner. Never style descendant spans here.
+.actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.confirmation { border: 2px solid var(--warning-color, #f59e0b); border-radius: 12px; padding: 22px; background: var(--bg-secondary); display: grid; gap: 16px; min-width: 0; h2 { font-size: 18px; margin: 0; } p { line-height: 1.7; } }
+.field { display: flex; flex-direction: column; gap: 8px; min-width: 0; input { width: 100%; max-width: 480px; min-width: 0; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-primary); color: var(--text-primary); } }
+.checkbox { display: flex; align-items: flex-start; gap: 10px; line-height: 1.7; input { flex-shrink: 0; margin-top: 5px; accent-color: var(--primary-color); } }
+.history { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; min-width: 0; > div { min-width: 0; flex: 1 1 280px; } p { color: var(--text-secondary); font-size: 13px; margin: 6px 0; overflow-wrap: anywhere; } }
+.footnote { font-size: 13px; color: var(--text-secondary); line-height: 1.8; }
+.page input:focus-visible { outline: 2px solid var(--focus-border, #3b82f6); outline-offset: 2px; }
+.operationCard { scroll-margin-top: 100px; }
+.progressHeader, .progressMeta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; }
+.progressMeta { justify-content: flex-start; font-size: 13px; color: var(--text-secondary); }
+.progressCurrent { font-size: 16px; font-weight: 600; }
+.progressBar { width: 100%; height: 8px; border: 0; border-radius: 4px; overflow: hidden; background: var(--app-surface-muted); accent-color: var(--primary-color); &::-webkit-progress-bar { background: var(--app-surface-muted); } &::-webkit-progress-value { background: var(--primary-color); } &::-moz-progress-bar { background: var(--primary-color); } }
+.page .progressSteps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px 16px; padding: 0; margin-top: 12px; list-style: none; font-size: 13px; line-height: 1.6; li { color: var(--text-secondary); overflow-wrap: anywhere; } li[data-state='current'] { color: var(--primary-color); font-weight: 600; } }
+.toolDetails { summary { cursor: pointer; color: var(--text-secondary); } ul { display: grid; gap: 8px; margin-top: 12px; } li { display: flex; flex-wrap: wrap; gap: 8px 16px; } }
+@media (max-width: 960px) { .sourceSection { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) {
+  .page { gap: 16px; }
+  .versions { grid-template-columns: minmax(0, 1fr); gap: 6px; dd { margin-bottom: 10px; } }
+  .confirmation { padding: 16px; }
+  .actions :global(.btn), .history :global(.btn) { max-width: 100%; white-space: normal; height: auto; min-height: 40px; padding: 10px 14px; }
+}

@@ -1,0 +1,103 @@
+[
+  {
+    "path": "internal/config/parse.go",
+    "sha256": [
+      "c09da6fc583effd45f8df33845140c3d699629d7a535cce5f6e4dbff5d8be45a",
+      "b02c9ca81cae37fc23d5cd6442a180b103584da533f9c4f379a4342994024698"
+    ],
+    "operations": [
+      {
+        "find": "return &cfg, nil",
+        "replace": "if errPolicy:=ValidateEmbedded(&cfg);errPolicy!=nil{return nil,errPolicy}\n return &cfg,nil",
+        "count": 1
+      },
+      {
+        "find": "cfg.LoggingToFile = false\n\tcfg.LogsMaxTotalSizeMB = 0",
+        "replace": "cfg.LoggingToFile = false\n\tcfg.LogsMaxTotalSizeMB = 0\n\tapplyEmbeddedLoggingDefaults(&cfg)",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "internal/config/config_load.go",
+    "sha256": [
+      "218956cf326339aec74d54f9c3384afc640abc2e1844208443b8e890c5d3ab0d",
+      "03a29fc05fd601a624e874aaa7057453c1e0763b034b0b2c520cf48adae1d515"
+    ],
+    "operations": [
+      {
+        "find": "return &cfg, nil",
+        "replace": "if errPolicy:=ValidateEmbedded(&cfg);errPolicy!=nil{return nil,errPolicy}\n return &cfg,nil",
+        "count": 1
+      },
+      {
+        "find": "cfg.LoggingToFile = false\n\tcfg.LogsMaxTotalSizeMB = 0",
+        "replace": "cfg.LoggingToFile = false\n\tcfg.LogsMaxTotalSizeMB = 0\n\tapplyEmbeddedLoggingDefaults(&cfg)",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "internal/config/config_yaml.go",
+    "sha256": "f3a3daefb1a031e4a35266761da3696b34166c123a3c1cd4c8a785ae4b1ea56f",
+    "operations": [
+      {
+        "find": "func SaveConfigPreserveComments(configFile string, cfg *Config, migrateV8 ...bool) error {",
+        "replace": "func SaveConfigPreserveComments(configFile string, cfg *Config, migrateV8 ...bool) error {\n if errPolicy:=ValidateEmbedded(cfg);errPolicy!=nil{return errPolicy}",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "sdk/config/config.go",
+    "sha256": "66c769c51dddf6aea21d5221ef1759551309acec861171c6cb3c9578530aa998",
+    "operations": [
+      {
+        "find": "func LoadConfig(configFile string) (*Config, error)",
+        "replace": "func ValidateEmbedded(cfg *Config)error{return internalconfig.ValidateEmbedded(cfg)}\n\nfunc LoadConfig(configFile string) (*Config, error)",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "sdk/cliproxy/service_config.go",
+    "sha256": [
+      "30d0653120ede53c6d518049773fc3f6651085af14100d7193f7a7183a8440e0",
+      "58813994284a5522539292c2b9d04ac1b9eb1f9fa659fd2c6d9529438994612f"
+    ],
+    "operations": [
+      {
+        "find": "func (s *Service) applyConfigUpdateWithAuthSynthesis(ctx context.Context, newCfg *config.Config, synthesizeConfigAuths bool) bool {",
+        "replace": "func (s *Service) applyConfigUpdateWithAuthSynthesis(ctx context.Context, newCfg *config.Config, synthesizeConfigAuths bool) bool {\n if errPolicy:=config.ValidateEmbedded(newCfg);errPolicy!=nil{log.WithError(errPolicy).Error(\"embedded configuration update rejected\");return false}",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "internal/api/handlers/management/auth_files_oauth_callback.go",
+    "sha256": "67a2ac0610c66585a5a32fba9ed449863966908a52e959656a7bd77798973818",
+    "operations": [
+      {
+        "find": "addr := fmt.Sprintf(\"0.0.0.0:%d\", port)",
+        "replace": "addr := callbackForwarderAddr(port)",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "path": "sdk/cliproxy/service_executionregistry_test.go",
+    "sha256": "41a268211d4902524b90a0ab7d650e08b65437b231b330e5e23d8e1e081d534b",
+    "operations": [
+      {
+        "find": "\tselect {\n\tcase <-secondSubscribe:\n\tcase <-time.After(time.Second):\n\t\tt.Fatal(\"new subscription did not start while the old scope remained active\")\n\t}\n\tservice.homeMu.Lock()",
+        "replace": "\t// Heartbeat detection precedes the initial equal-jitter retry (up to 1s).\n\t// Match the peer lifetime tests' bound, while watching for any bad drain\n\t// throughout the wait rather than only during the first 50ms.\n\tselect {\n\tcase <-secondSubscribe:\n\tcase <-started:\n\t\tt.Fatal(\"heartbeat failover started draining the blocking scope\")\n\tcase <-time.After(3 * homeSubscriberRetryInitial):\n\t\tt.Fatal(\"new subscription did not start while the old scope remained active\")\n\t}\n\tselect {\n\tcase <-started:\n\t\tt.Fatal(\"heartbeat failover started draining the blocking scope\")\n\tdefault:\n\t}\n\tservice.homeMu.Lock()",
+        "count": 1
+      },
+      {
+        "find": "\tselect {\n\tcase <-serviceCtx.Done():\n\t\tt.Fatal(\"heartbeat failover canceled the service run\")\n\tcase <-time.After(50 * time.Millisecond):\n\t}\n\n\tclose(release)\n\tscope.End(\"test cleanup\")",
+        "replace": "\tselect {\n\tcase <-started:\n\t\tt.Fatal(\"heartbeat failover started draining the blocking scope\")\n\tcase <-serviceCtx.Done():\n\t\tt.Fatal(\"heartbeat failover canceled the service run\")\n\tcase <-time.After(50 * time.Millisecond):\n\t}\n\tselect {\n\tcase <-started:\n\t\tt.Fatal(\"heartbeat failover started draining the blocking scope\")\n\tdefault:\n\t}\n\n\tclose(release)\n\tscope.End(\"test cleanup\")",
+        "count": 1
+      }
+    ]
+  }
+]
