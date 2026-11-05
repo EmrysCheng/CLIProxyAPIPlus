@@ -1,5 +1,7 @@
 # CLIProxyAPIPlus 实施状态
 
+> 本文包含按阶段保留的历史实施记录；下文日期、旧入口与当时未执行事项不应当作现行使用说明。当前候选版本为 `0.4.0-rc.6`，默认使用[双上游源码自更新](SOURCE_UPDATES_CN.md)，不需要额外发行服务。完整使用说明见[仓库用户指南](https://github.com/EmrysCheng/CLIProxyAPIPlus/blob/master/docs/USER_GUIDE_CN.md)；生产门禁见[发行检查清单](RELEASE_CHECKLIST_CN.md)。
+
 更新日期：**2026-11-04（Asia/Shanghai）**。用户已确认计划并要求继续全部后续阶段。
 
 ## 0.3.0-rc.1 网页维护扩展（2026-11-04）

@@ -1,6 +1,6 @@
 # 运维、数据迁移与双上游更新
 
-适用版本：0.2.0-rc.1 / 0.2.0-rc.2 / 0.3.0-rc.1（rc.2 内嵌时区数据并默认启用共享文件日志）。命令从源码工作区执行；可执行程序本身运行不需要 Python/Go/Node，维护脚本需要 Python 3.12+。发行 ZIP/tar 中附带 `tools/data.py`、`tools/upgrade.py`、`tools/private.py`、`tools/archive_paths.py`，使用时把下文 `scripts/` 改成 `tools/`，或继续从源码工作区运行。所有示例路径应替换成真实部署路径，先在副本上演练。
+适用版本：`0.4.0-rc.6`（候选版，未完成全部生产验收）；保留早期离线维护及整包索引模式说明。默认页面更新方式见 [双上游源码自更新](SOURCE_UPDATES_CN.md)，首次使用见[详细使用指南](https://github.com/EmrysCheng/CLIProxyAPIPlus/blob/master/docs/USER_GUIDE_CN.md)。命令从源码工作区执行；常规业务运行不依赖系统 Python/Go/Node，维护脚本需要 Python 3.12+（完整 Portable 包可使用内置 Python）。发行 ZIP/tar 中附带 `tools/data.py`、`tools/upgrade.py`、`tools/private.py`、`tools/archive_paths.py`，使用时把下文 `scripts/` 改成 `tools/`，或继续从源码工作区运行。所有示例路径应替换成真实部署路径，先在副本上演练。
 
 ## 1. 配置职责
 
@@ -53,6 +53,8 @@ Python 使用和 Go Manager 相同的 OS 文件锁；数据库通过 SQLite back
 
 ## 4. 整包程序升级和成对回滚
 
+本节 `upgrade.py` 是离线主程序/数据维护工具，**不会自动安装新的 SDK、匹配源码配方或其余完整包内容**。0.4.x 的产品换版应先保留旧完整目录，将可信新完整包解压至新目录，使用原 config/data 路径受控迁移并验证；不要以只替换 EXE 作为升级完成。独立 Portable 的双上游页面更新采用第 9 节与专用事务引擎，不使用本节脚本拼接不同版本的配方。
+
 1. 确认来源、签名/可信校验和及发行说明，尤其是 schema 迁移；没有正式签名时由内部受控渠道确认 SHA256。
 2. 停止服务；保留数据目录与安装路径，不在运行中替换 exe。
 3. 先 dry-run，再显式执行：
@@ -67,7 +69,7 @@ python scripts/upgrade.py install --binary <installed-binary> --candidate <new-b
 6. 成功状态为 `awaiting_restart_and_health_check`，不是已经完成线上健康检查。由服务管理器重启后执行：
 
 ```powershell
-python scripts/upgrade.py verify-running --url http://127.0.0.1:8317 --version 0.2.0-rc.2
+python scripts/upgrade.py verify-running --url http://127.0.0.1:8317 --version <实际目标整合版本>
 # 若需撤回，先停止服务
 python scripts/upgrade.py rollback --journal <upgrade-history/id/journal.json>
 ```
@@ -84,11 +86,11 @@ python scripts/upgrade.py rollback --journal <upgrade-history/id/journal.json>
 - 候选期间产品/补丁/文档变动、上游树变动或当前基线 lock 改变都会使回执失效，必须重做候选。
 - `promote` 在互斥 OS 锁下先复制候选，再记 journal、交换两份快照，最后替换 lock；中断恢复用 `python scripts/upstreams.py recover --journal <promotion-journal>`。
 - 晋级只操作源码，不安装、不推送、不发布。原始两个 LICENSE 保留。
-- 每日工作流只生成验证回执/候选包；发布必须另走可信审批，不能给上游测试授予生产凭据或 write token。
+- 每日工作流只导出白名单候选/验证元数据，不公开完整候选源码或安装包；发布必须另走可信审批，不能给上游测试授予生产凭据或 write token。
 
 ## 6. Docker / Compose（需原生验证）
 
-Dockerfile 是单程序、多阶段编译，最终镜像不包含 Node/Go；Compose 只映射一个业务端口，默认宿主回环、非 root、只读根文件系统。当前机器没有 Docker，以下步骤是交付的操作路径，不是已运行证据。
+Dockerfile 是单程序、多阶段编译，最终阶段复制完整产物目录，当前也包含随包构建工具，但常规业务入口不运行 Node/Go；Compose 只映射一个业务端口，默认宿主回环、非 root、只读根文件系统。以下步骤是需要在目标环境验证的操作路径，不是已通过容器生产验收的证据。
 
 ```sh
 mkdir -p runtime
@@ -152,4 +154,4 @@ python scripts/benchmark.py --core-binary .build/regressions/core.exe --samples 
 
 ## 9. 现行默认：直接更新两个基础项目（0.4.0）
 
-使用 `--web-updates --source-updates`，不配置发行索引，不启动额外发行服务。包内 updater-source 与主程序身份匹配，本机具备受信任的 Python/Go/Node/npm。页面按固定仓库正式版检查、固定提交、管理员确认执行源码、隔离适配与验证，然后进入原事务安装/回滚。详细步骤和不是 OS 沙箱的信任限制见 [SOURCE_UPDATES_CN.md](SOURCE_UPDATES_CN.md)。第 8 节的外部整包索引方式仅保留为高级兼容选项，不是源码自更新依赖。
+使用 `--web-updates --source-updates`，不配置发行索引，不启动额外发行服务。包内 updater-source 与主程序身份匹配，完整 Portable 包内置受信任且经校验的 Python/Go/Node/npm，不需要用户另外下载；仍须联网获取源码和依赖。页面按固定仓库正式版检查、固定提交、管理员确认执行源码、隔离适配与验证，然后进入原事务安装/回滚。详细步骤和不是 OS 沙箱的信任限制见 [SOURCE_UPDATES_CN.md](SOURCE_UPDATES_CN.md)。第 8 节的外部整包索引方式仅保留为高级兼容选项，不是源码自更新依赖。
