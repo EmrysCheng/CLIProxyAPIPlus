@@ -19,8 +19,18 @@ import uuid
 import zipfile
 
 ROOT=Path(__file__).resolve().parents[1]
-DEFAULT_BINARY=ROOT/'dist/windows-amd64-portable/cliproxyapi-plus.exe' if os.name=='nt' else ROOT/'dist/linux-amd64-portable/cliproxyapi-plus'
-if (ROOT/('cliproxyapi-plus.exe' if os.name=='nt' else 'cliproxyapi-plus')).is_file():DEFAULT_BINARY=ROOT/('cliproxyapi-plus.exe' if os.name=='nt' else 'cliproxyapi-plus')
+def default_binary(root=ROOT, *, system=None, machine=None):
+    system = os.name if system is None else system
+    executable = 'cliproxyapi-plus.exe' if system == 'nt' else 'cliproxyapi-plus'
+    installed = root / executable
+    if installed.is_file():
+        return installed
+    arch = 'arm64' if (machine or platform.machine()).lower() in ('aarch64', 'arm64') else 'amd64'
+    target = 'windows-amd64' if system == 'nt' else 'linux-' + arch
+    return root / 'dist' / (target + '-portable') / executable
+
+
+DEFAULT_BINARY = default_binary()
 
 def sha(path):
     digest=hashlib.sha256()

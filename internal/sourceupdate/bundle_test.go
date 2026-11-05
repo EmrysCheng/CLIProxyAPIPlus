@@ -109,8 +109,30 @@ func TestPackagedSDKWithoutHostTools(t *testing.T) {
 	t.Setenv("GOROOT", filepath.Join(t.TempDir(), "old Go"))
 	t.Setenv("NODE_OPTIONS", "--require=nonexistent-host-injection")
 	t.Setenv("PYTHONHOME", filepath.Join(t.TempDir(), "old Python"))
+	started := time.Now()
 	tools, status := resolveTools(context.Background(), config)
 	if !status.Ready || status.Origin != "bundled" || tools.Bundle == "" {
+		t.Logf("bundled readiness elapsed=%s", time.Since(started))
+		if status.Origin == "bundled" && status.Versions["Node"] != "" && tools.Node != "" && tools.NpmCLI != "" {
+			// Diagnose the same pinned npm on a cold/slow host, but NEVER turn
+			// a failed readiness check into a pass. Do not log command output,
+			// local configuration, environment values, or credential-bearing errors.
+			probeCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+			defer cancel()
+			command := exec.CommandContext(probeCtx, tools.Node, tools.NpmCLI, "--version")
+			command.Env = toolEnvironment(tools)
+			hideProbe(command)
+			started := time.Now()
+			raw, err := command.CombinedOutput()
+			exitCode := 0
+			if err != nil {
+				exitCode = -1
+				if exit, ok := err.(*exec.ExitError); ok {
+					exitCode = exit.ExitCode()
+				}
+			}
+			t.Logf("bundled npm diagnostic elapsed=%s exit=%d deadline=%t output_bytes=%d", time.Since(started), exitCode, probeCtx.Err() != nil, len(raw))
+		}
 		t.Fatal(status)
 	}
 	probe := func(path string, args ...string) string {
