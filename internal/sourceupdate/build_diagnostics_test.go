@@ -124,6 +124,33 @@ func buildFailureDiagnostics(raw []byte, knownGo, knownPython map[string]bool) b
 		{"WinError 5", "windows_access_denied"},
 		{"WinError 32", "windows_sharing_violation"},
 		{"[build failed]", "go_compile_failure"},
+		{"[setup failed]", "go_setup_failure"},
+		{"Access is denied.", "windows_access_denied"},
+		{"The system cannot find the file specified", "windows_file_not_found"},
+		{"The directory name is invalid", "windows_invalid_directory"},
+		{"missing go.sum entry", "go_module_checksum_missing"},
+		{"checksum mismatch", "dependency_checksum_mismatch"},
+		{"403 Forbidden", "dependency_http_forbidden"},
+		{"429 Too Many Requests", "dependency_http_rate_limited"},
+		{"502 Bad Gateway", "dependency_http_gateway_failure"},
+		{"504 Gateway Time-out", "dependency_http_gateway_timeout"},
+		{"Unrecognized import path", "go_import_resolution_failure"},
+		{"no such host", "network_dns_failure"},
+		{"TLS handshake timeout", "network_tls_timeout"},
+		{"certificate signed by unknown authority", "network_certificate_failure"},
+		{"connection was forcibly closed", "network_connection_reset"},
+		{"i/o timeout", "network_io_timeout"},
+		{"unexpected EOF", "unexpected_eof"},
+		{"The filename or extension is too long", "windows_path_too_long"},
+		{"The system cannot find the path specified", "windows_path_not_found"},
+		{"not enough memory", "memory_exhausted"},
+		{"out of memory", "memory_exhausted"},
+		{"no space left on device", "disk_exhausted"},
+		{"Traceback (most recent call last):", "python_traceback"},
+		{"ModuleNotFoundError:", "python_module_missing"},
+		{"ImportError:", "python_import_failure"},
+		{"FileNotFoundError:", "python_file_missing"},
+		{"Owned build process failed: exit status 1", "worker_exit_one"},
 	} {
 		if strings.Contains(text, signal.marker) {
 			summary.ObservedSignals = append(summary.ObservedSignals, signal.code)
@@ -151,5 +178,20 @@ func TestKnownDiagnosticNamesAreReadFromDeclaredTestSources(t *testing.T) {
 	goNames, pythonNames := knownDiagnosticTestNames(root)
 	if !goNames["TestPublic"] || goNames["TestOther"] || !pythonNames["test_public"] {
 		t.Fatalf("unexpected public name inventory: %v %v", goNames, pythonNames)
+	}
+}
+
+func TestBuildFailureDiagnosticsClassifySetupErrorsWithoutPublishingOutput(t *testing.T) {
+	raw := []byte("FAIL cliproxyapi-plus/internal/x [setup failed]\nGet https://private.example/secret: dial tcp: no such host\nTraceback (most recent call last):\n")
+	summary := buildFailureDiagnostics(raw, nil, nil)
+	encoded, _ := json.Marshal(summary)
+	text := string(encoded)
+	for _, expected := range []string{"go_setup_failure", "network_dns_failure", "python_traceback"} {
+		if !strings.Contains(text, expected) {
+			t.Fatalf("missing fixed signal %s: %s", expected, text)
+		}
+	}
+	if strings.Contains(text, "private") || strings.Contains(text, "secret") {
+		t.Fatal("raw output was exposed")
 	}
 }
