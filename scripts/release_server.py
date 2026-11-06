@@ -77,5 +77,5 @@ def build(args, env):
     # Never delete an existing checkout/deployment or include its old runtime logs.
     # The archive is assembled solely from our fresh private stage.
     shutil.copytree(stage, destination, dirs_exist_ok=True)
-    print('Standalone release-server candidate built:', destination / binary.name)
+    print('Standalone release-server package built:', destination / binary.name)
     print('Prepared index:', destination / 'releases/index.json')

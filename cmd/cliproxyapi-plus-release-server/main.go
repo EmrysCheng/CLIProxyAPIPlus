@@ -17,10 +17,11 @@ import (
 	"syscall"
 	"time"
 
+	"cliproxyapi-plus/internal/buildinfo"
 	"cliproxyapi-plus/internal/releaseserver"
 )
 
-var Version = "0.3.0-rc.3"
+var Version = "development"
 var SourceDigest = "development"
 var BuildDate = "unknown"
 
@@ -41,7 +42,7 @@ func run(ctx context.Context, args []string, out io.Writer) error {
 		return errors.New("unexpected positional arguments")
 	}
 	if *version {
-		return json.NewEncoder(out).Encode(map[string]any{"role": "local-release-server", "version": Version, "phase": "release-candidate", "product_source_sha256": SourceDigest, "build_date": BuildDate, "os": runtime.GOOS, "arch": runtime.GOARCH})
+		return json.NewEncoder(out).Encode(map[string]any{"role": "local-release-server", "version": Version, "phase": buildinfo.Phase(Version), "product_source_sha256": SourceDigest, "build_date": BuildDate, "os": runtime.GOOS, "arch": runtime.GOARCH})
 	}
 	config, err := releaseserver.LoadConfig(*configPath)
 	if err != nil {

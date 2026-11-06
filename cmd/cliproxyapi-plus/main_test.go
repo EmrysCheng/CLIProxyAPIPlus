@@ -247,3 +247,19 @@ func TestSinglePortEndToEnd(t *testing.T) {
 	}
 	t.Log("PASS: one listener; real Manager frontend; distinct admin/API/internal credentials; in-process core management; mock-provider JSON + SSE; SQLite usage; bounded shutdown")
 }
+
+func TestVersionPhaseMatchesBuildVersion(t *testing.T) {
+	previous := Version
+	t.Cleanup(func() { Version = previous })
+	for _, test := range []struct{ version, want string }{
+		{"0.4.0", "release"},
+		{"0.4.0-rc.6", "release-candidate"},
+		{"development", "development"},
+	} {
+		Version = test.version
+		identity := versions()
+		if identity.Version != test.version || identity.Phase != test.want {
+			t.Fatalf("unexpected identity for %q: %+v", test.version, identity)
+		}
+	}
+}

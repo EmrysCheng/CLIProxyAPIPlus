@@ -2,7 +2,7 @@
 
 The source trees in upstream/ are immutable. changes.json pins each preimage SHA-256 and every replacement count. files/ adds the public embedded facade and the CPA-only transport injection inside the original module. scripts/project.py prepares isolated copies and refuses drift rather than using fuzzy patch matching.
 
-P0 intentionally mirrors the pinned Manager entrypoint. P1 must extract a shared lifecycle used by both entrypoints, add worker-drain tests, and audit startup maintenance errors before calling this production-ready. No proxy protocol translator is modified.
+Embedded and standalone Manager entrypoints share lifecycle initialization, database locking, background-task drain and native maintenance paths. Their engineering tests do not replace the separate release/distribution and production-deployment acceptance checklists. No proxy protocol translator is modified.
 
 ## Reviewed upstream preimages
 

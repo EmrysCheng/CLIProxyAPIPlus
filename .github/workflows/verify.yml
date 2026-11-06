@@ -1,4 +1,4 @@
-name: Verify integrated candidate
+name: Verify integrated release
 on:
   push:
   pull_request:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Smoke-test the packaged release-candidate binary using disposable data and one loopback port."""
+"""Smoke-test the packaged binary using disposable data and one loopback port."""
 import platform
 import argparse
 import json
@@ -19,7 +19,7 @@ def main():
     parser.add_argument('--binary',default=str(ROOT/'dist'/('windows-amd64-portable/cliproxyapi-plus.exe' if os.name=='nt' else ('linux-'+('arm64' if platform.machine() in ['aarch64','arm64'] else 'amd64')+'-portable/cliproxyapi-plus'))))
     args=parser.parse_args()
     binary=Path(args.binary).resolve()
-    if not binary.is_file(): raise RuntimeError('Build the release-candidate binary first')
+    if not binary.is_file(): raise RuntimeError('Build the packaged binary first')
     work=ROOT/'.build/smoke'/uuid.uuid4().hex
     work.mkdir(parents=True)
     config=work/'config.yaml';data=work/'data'
@@ -88,7 +88,9 @@ def main():
         status,payload,_=request('/plus-api/version')
         identity=json.loads(payload)
         lock=json.loads((ROOT/'upstream.lock.json').read_text(encoding='utf-8'))
-        assert status==200 and identity['phase']=='release-candidate'
+        expected_version=(ROOT/'VERSION').read_text(encoding='utf-8').strip()
+        expected_phase='release-candidate' if '-' in expected_version else 'release'
+        assert status==200 and identity['version']==expected_version and identity['phase']==expected_phase
         assert identity['core_commit']==lock['projects']['cliproxyapi']['commit']
         assert identity['manager_commit']==lock['projects']['cpa-manager-plus']['commit']
         lowered={k.lower():v for k,v in headers.items()}

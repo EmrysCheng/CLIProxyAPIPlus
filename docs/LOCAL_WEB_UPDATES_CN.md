@@ -2,7 +2,7 @@
 
 # 本地页面升级：配置、提醒、执行与回滚
 
-适用版本：**0.3.0-rc.2 及之后支持 `--allow-local-release-http` 的候选版**。本功能不代表生产准入门禁已完成。
+适用版本：**0.4.0**。本节为可选兼容部署方案，不代表所有生产部署门禁已签收。所需产品包/发行服务包须自行构建并核验，本次公开 Release 不附带二进制。
 
 ## 1. 地址分别代表什么
 
@@ -22,13 +22,13 @@ HTTP 仅接受**回环 IP 字面量**，如 `127.0.0.1`、`::1`。不接受 `loc
 
 ## 2. 首次安装支持本地 HTTP 的程序
 
-旧 0.3.0-rc.1 不识别新参数，必须先正常退出旧进程，备份原程序/配置/data，再手动替换为 0.3.0-rc.2 或更新的已验证整合程序。仅替换正确的平台程序，保留原配置和数据。**不要对已有实例重新执行 `--init`**。
+早期不识别本机 HTTP 开关的实例，需先正常退出旧进程、备份原程序/配置/data，再将已核验的 0.4.0 完整包解压至新目录，以原配置和数据路径启动；不要只替换 EXE 或混用源码配方。**不要对已有实例重新执行 `--init`**。
 
 以下按源码位于 `D:\Code\Project\AI\CLIProxyAPIPlus`、发行源端口 26973 举例。应用的配置/data 路径改为你实际部署的位置；不要为了照抄例子创建一个空 data。
 
-## 推荐：使用已打包的独立发行服务（0.3.0-rc.3）
+## 可选：构建并使用独立发行服务
 
-现在有 `CLIProxyAPIPlus_ReleaseServer_<版本>_<平台>_portable` 独立包，包含 EXE/可执行程序、配置、启动脚本、索引和已验证的产品安装包。**使用者无须 Python/Node/Go**：解压后 Windows 运行 `start.cmd`，Linux 运行 `./start.sh`，然后继续本文第 5 节配置应用。详细配置见 [RELEASE_SERVER_CN.md](RELEASE_SERVER_CN.md)。下方第 3/4 节保留为开发者的 Python 发布/临时服务替代方式，不再是使用者必选步骤。
+仓库可构建 `CLIProxyAPIPlus_ReleaseServer_<版本>_<平台>_portable` 独立包，包含 EXE/可执行程序、配置、启动脚本、索引和已验证的产品安装包。**使用者无须 Python/Node/Go**：解压后 Windows 运行 `start.cmd`，Linux 运行 `./start.sh`，然后继续本文第 5 节配置应用。详细配置见 [RELEASE_SERVER_CN.md](RELEASE_SERVER_CN.md)。下方第 3/4 节保留为开发者的 Python 发布/临时服务替代方式，不再是使用者必选步骤。
 
 ## 3. 生成索引并准备发行目录
 
@@ -57,9 +57,9 @@ py -3 "D:\Code\Project\AI\CLIProxyAPIPlus\scripts\release_index.py" `
 ```text
 .build/local-releases/
   index.json
-  CLIProxyAPIPlus_0.3.0-rc.2_windows_amd64_portable.zip
-  CLIProxyAPIPlus_0.3.0-rc.2_linux_amd64_portable.tar.gz
-  CLIProxyAPIPlus_0.3.0-rc.2_linux_arm64_portable.tar.gz
+  CLIProxyAPIPlus_0.4.0_windows_amd64_portable.zip
+  CLIProxyAPIPlus_0.4.0_linux_amd64_portable.tar.gz
+  CLIProxyAPIPlus_0.4.0_linux_arm64_portable.tar.gz
 ```
 
 只有实际构建的平台包才会出现。Windows 安装只选择匹配 Windows/架构的整合包。
@@ -100,7 +100,7 @@ cliproxyapi-plus.exe --config config.yaml --data-dir data `
 
 1. 使用 Manager **管理员凭据**登录原管理页面，打开更新页。API key/core key 不具备升级权限。
 2. 后端启动时并每 6 小时自动检查。全局提醒约 60 秒刷新，也可在更新页点击“检查更新”。不会后台自动安装。
-3. **只有发行版本严格高于当前版本**才出现可安装更新。相同版本显示已是该发行版本，旧版不能当作升级安装。若当前已是 rc.2，发布 rc.2 不会制造提醒；需等待或构建真实的更新版本。没有配置/检查失败不等于“已经最新”。
+3. **只有发行版本严格高于当前版本**才出现可安装更新。相同版本显示已是该发行版本，旧版不能当作升级安装。若当前已是 0.4.0，再发布 0.4.0 不会制造提醒；需等待或构建真实的更新版本。没有配置/检查失败不等于“已经最新”。
 4. 输入目标版本确认后点击“升级并重启”。系统下载并校验当前平台整合包、程序身份、源码摘要和更新能力，然后正常排空旧进程、备份程序/配置/数据库/密钥/认证文件、安装并验证新进程健康。
 5. 页面会短暂断线，约每 3 秒重连刷新操作状态。不要重复点击，不要手动启动第二个实例。以成功记录和新版本信息为准，断线不代表成功。
 
@@ -117,7 +117,7 @@ cliproxyapi-plus.exe --config config.yaml --data-dir data `
 
 | 现象 | 处理 |
 | --- | --- |
-| `flag provided but not defined: -allow-local-release-http` | 正在运行旧程序，先手动替换为支持该参数的候选版 |
+| `flag provided but not defined: -allow-local-release-http` | 正在运行旧程序，先停机备份并换成支持该参数的完整安装包 |
 | `release index must be ... HTTPS ...` | 没有加本机 HTTP 开关，或 URL 不是回环 IP；生成器和应用均须显式开启 |
 | `Product release index unavailable` | 确认静态服务器在同机运行，端口/路径正确，检查不是仅在远端浏览器机器能访问 |
 | `invalid product asset metadata` | 索引包 URL 非同源/不受允许，或包名/摘要有误；重新生成，不手填绕过 |

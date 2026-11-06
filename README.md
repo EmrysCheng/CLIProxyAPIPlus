@@ -2,9 +2,9 @@
 
 将 [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) 与 [CPA-Manager-Plus](https://github.com/seakee/CPA-Manager-Plus) 在源码层面整合：**一个 Go 程序、一个对外业务端口，使用 CPA-Manager-Plus 原有前端**。
 
-> **版本状态：`0.4.0-rc.6`，候选版（RC）。全部生产验收尚未完成，不能视为正式生产版本。** 本仓库没有承诺已发布的正式安装包或容器镜像；自行构建的产物也不等于通过发行审批。验收边界见[正式发行检查清单](docs/RELEASE_CHECKLIST_CN.md)。
+> **当前版本：`0.4.0`，正式源码发行。** [发布说明与源码下载](https://github.com/EmrysCheng/CLIProxyAPIPlus/releases/tag/v0.4.0)。本次不附带未完成发布签收的二进制安装包或公共镜像；Windows 完整源码构建和 Linux Full/race 仍有已知 CI 失败，详见[发布说明](docs/releases/v0.4.0.md)。正式版本号不表示全部生产场景已验收，部署前请核对[发行与生产部署验收清单](docs/RELEASE_CHECKLIST_CN.md)。
 
-[使用指南](docs/USER_GUIDE_CN.md) · [页面升级与回滚](docs/SOURCE_UPDATES_CN.md) · [开发与构建](docs/DEVELOPMENT_CN.md) · [文档目录](docs/README.md)
+[更新记录](CHANGELOG.md) · [使用指南](docs/USER_GUIDE_CN.md) · [页面升级与回滚](docs/SOURCE_UPDATES_CN.md) · [开发与构建](docs/DEVELOPMENT_CN.md) · [文档目录](docs/README.md)
 
 ## 功能概览
 
@@ -42,7 +42,7 @@
 
 构建目标包括 `windows/amd64`、`linux/amd64`、`linux/arm64`。平台可打包不代表已经完成该平台原生生产验收。Linux 内置构建工具要求 glibc 2.28+，不是 Alpine/musl 版本。
 
-从受信任渠道取得**完整匹配的候选包**，或按[源码构建指南](docs/DEVELOPMENT_CN.md)生成。保留程序旁的 `build-tools/`、`update-tools.json`、`updater-source/`，不要只复制 EXE。以下命令均在解压后的安装目录执行。
+从受信任渠道取得**完整匹配的安装包**，或按[源码构建指南](docs/DEVELOPMENT_CN.md)生成。保留程序旁的 `build-tools/`、`update-tools.json`、`updater-source/`，不要只复制 EXE。以下命令均在解压后的安装目录执行。
 
 ### 2. 仅在全新目录初始化并启动
 

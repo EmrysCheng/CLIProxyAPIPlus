@@ -1,6 +1,6 @@
 # CLIProxyAPIPlus · 中文快速使用
 
-当前版本：**`0.4.0-rc.6` 候选版，尚未完成全部生产验收，不是正式生产版本。**
+当前版本：**`0.4.0`，正式源码发行。** [Release 与源码下载](https://github.com/EmrysCheng/CLIProxyAPIPlus/releases/tag/v0.4.0)。本次不公开二进制安装包，使用者需按仓库开发指南构建；生产部署范围与已知 CI 问题见[验收清单](docs/RELEASE_CHECKLIST_CN.md)。
 
 CLIProxyAPI 核心、CPA-Manager-Plus 管理后端和原 React 前端编译为一个 Go 程序，共用一个对外业务端口。此文件也随 Portable 包分发；仓库首页见 [README.md](https://github.com/EmrysCheng/CLIProxyAPIPlus/blob/master/README.md)，完整操作见[详细使用指南](https://github.com/EmrysCheng/CLIProxyAPIPlus/blob/master/docs/USER_GUIDE_CN.md)。
 

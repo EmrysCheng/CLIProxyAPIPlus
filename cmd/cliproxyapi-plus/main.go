@@ -21,6 +21,7 @@ import (
 	// Keep portable installs independent of a Go SDK or host IANA database.
 	_ "time/tzdata"
 
+	"cliproxyapi-plus/internal/buildinfo"
 	"cliproxyapi-plus/internal/integration"
 	"cliproxyapi-plus/internal/policy"
 	"cliproxyapi-plus/internal/private"
@@ -36,7 +37,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var Version = "0.4.0-rc.1"
+var Version = "development"
 var SourceDigest = "development"
 var BuildDate = "unknown"
 var LockDigest = "development"
@@ -63,7 +64,7 @@ type versionInfo struct {
 }
 
 func versions() versionInfo {
-	return versionInfo{OS: runtime.GOOS, Arch: runtime.GOARCH, WebUpdateProtocol: webupdate.Protocol, LocalReleaseHTTP: true, SourceUpdateProtocol: 1, LockDigest: LockDigest, SourceDigest: SourceDigest, BuildDate: BuildDate, Version: Version, Phase: "release-candidate", CoreVersion: CoreVersion, CoreCommit: CoreCommit, ManagerVersion: ManagerVersion, ManagerCommit: ManagerCommit}
+	return versionInfo{OS: runtime.GOOS, Arch: runtime.GOARCH, WebUpdateProtocol: webupdate.Protocol, LocalReleaseHTTP: true, SourceUpdateProtocol: 1, LockDigest: LockDigest, SourceDigest: SourceDigest, BuildDate: BuildDate, Version: Version, Phase: buildinfo.Phase(Version), CoreVersion: CoreVersion, CoreCommit: CoreCommit, ManagerVersion: ManagerVersion, ManagerCommit: ManagerCommit}
 }
 
 func main() {

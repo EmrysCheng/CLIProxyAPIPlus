@@ -1,6 +1,6 @@
 # 运维、数据迁移与双上游更新
 
-适用版本：`0.4.0-rc.6`（候选版，未完成全部生产验收）；保留早期离线维护及整包索引模式说明。默认页面更新方式见 [双上游源码自更新](SOURCE_UPDATES_CN.md)，首次使用见[详细使用指南](https://github.com/EmrysCheng/CLIProxyAPIPlus/blob/master/docs/USER_GUIDE_CN.md)。命令从源码工作区执行；常规业务运行不依赖系统 Python/Go/Node，维护脚本需要 Python 3.12+（完整 Portable 包可使用内置 Python）。发行 ZIP/tar 中附带 `tools/data.py`、`tools/upgrade.py`、`tools/private.py`、`tools/archive_paths.py`，使用时把下文 `scripts/` 改成 `tools/`，或继续从源码工作区运行。所有示例路径应替换成真实部署路径，先在副本上演练。
+适用版本：`0.4.0`（正式源码发行；未完成的生产部署验收单独记录）；保留早期离线维护及整包索引模式说明。默认页面更新方式见 [双上游源码自更新](SOURCE_UPDATES_CN.md)，首次使用见[详细使用指南](https://github.com/EmrysCheng/CLIProxyAPIPlus/blob/master/docs/USER_GUIDE_CN.md)。命令从源码工作区执行；常规业务运行不依赖系统 Python/Go/Node，维护脚本需要 Python 3.12+（完整 Portable 包可使用内置 Python）。发行 ZIP/tar 中附带 `tools/data.py`、`tools/upgrade.py`、`tools/private.py`、`tools/archive_paths.py`，使用时把下文 `scripts/` 改成 `tools/`，或继续从源码工作区运行。所有示例路径应替换成真实部署路径，先在副本上演练。
 
 ## 1. 配置职责
 
@@ -15,7 +15,7 @@
 
 ### 1.1 运行日志
 
-rc.2 合并入口在核心/Manager 启动前配置上游文件轮转，并将 Manager 的标准库日志转入共享 logger。默认 `logging-to-file: true`、`logs-max-total-size-mb: 100`，缺省补齐只作用于运行时，不为补默认值重写旧配置；显式 `false`/`0` 保留含义。初始化会写出这两个字段。默认变更同时覆盖磁盘加载和上传解析，避免热更新回到旧缺省值。
+合并入口在核心/Manager 启动前配置上游文件轮转，并将 Manager 的标准库日志转入共享 logger。默认 `logging-to-file: true`、`logs-max-total-size-mb: 100`，缺省补齐只作用于运行时，不为补默认值重写旧配置；显式 `false`/`0` 保留含义。初始化会写出这两个字段。默认变更同时覆盖磁盘加载和上传解析，避免热更新回到旧缺省值。
 
 `main.log` 单文件 10 MB，旧日志每分钟按总量目标清理，当前活跃日志受保护。目录优先 `WRITABLE_PATH/logs`，否则为工作目录中已存在且可写的 `logs`，再回退到原生 `auth-dir/logs`；以启动时打印的绝对路径为准。需要固定目录时先设置 `WRITABLE_PATH`（不是 `ZONEINFO`）。日志目录中不要放置无关 `.log` 文件，上游清理器会按后缀识别旧日志。文件不可打开时启动失败并在控制台显示错误；后续运行期磁盘耗尽仍需运维告警与容量监控。现有日志读取/下载接口及文件/控制台热切换沿用核心能力。
 
@@ -149,7 +149,7 @@ python scripts/benchmark.py --core-binary .build/regressions/core.exe --samples 
 
 ### 8.2 本机 HTTP 发行源
 
-0.3.0-rc.2 起可显式加 `--allow-local-release-http`。仅回环 IP 字面量，不允许 DNS/局域网地址；包与重定向必须同索引 HTTP origin，普通 HTTPS 策略不降级。完整配置与错误排查见 [LOCAL_WEB_UPDATES_CN.md](LOCAL_WEB_UPDATES_CN.md)。生成器同名开关只负责生成本机索引，应用必须独立显式开启。`product_source_sha256` 来源于校验包的 build-info，并与候选 binary 身份匹配；commit-only 旧索引仍兼容。升级重启与回滚保留启动开关，拒绝不支持本机 HTTP 开关的候选程序。
+当前版本可显式加 `--allow-local-release-http`。仅回环 IP 字面量，不允许 DNS/局域网地址；包与重定向必须同索引 HTTP origin，普通 HTTPS 策略不降级。完整配置与错误排查见 [LOCAL_WEB_UPDATES_CN.md](LOCAL_WEB_UPDATES_CN.md)。生成器同名开关只负责生成本机索引，应用必须独立显式开启。`product_source_sha256` 来源于校验包的 build-info，并与候选 binary 身份匹配；commit-only 旧索引仍兼容。升级重启与回滚保留启动开关，拒绝不支持本机 HTTP 开关的候选程序。
 
 
 ## 9. 现行默认：直接更新两个基础项目（0.4.0）

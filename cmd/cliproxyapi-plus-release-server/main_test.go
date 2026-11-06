@@ -93,3 +93,29 @@ func TestVersionAndGracefulShutdown(t *testing.T) {
 		t.Fatal("listener remained active after shutdown")
 	}
 }
+
+func TestVersionPhaseMatchesBuildVersion(t *testing.T) {
+	previous := Version
+	t.Cleanup(func() { Version = previous })
+	for _, test := range []struct{ version, want string }{
+		{"0.4.0", "release"},
+		{"0.4.0-rc.6", "release-candidate"},
+		{"development", "development"},
+	} {
+		Version = test.version
+		var output bytes.Buffer
+		if err := run(context.Background(), []string{"--version"}, &output); err != nil {
+			t.Fatal(err)
+		}
+		var identity struct {
+			Version string `json:"version"`
+			Phase   string `json:"phase"`
+		}
+		if err := json.Unmarshal(output.Bytes(), &identity); err != nil {
+			t.Fatal(err)
+		}
+		if identity.Version != test.version || identity.Phase != test.want {
+			t.Fatalf("unexpected identity for %q: %+v", test.version, identity)
+		}
+	}
+}

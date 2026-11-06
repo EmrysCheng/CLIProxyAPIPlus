@@ -456,7 +456,7 @@ def main():
             write_release_tar(archive, dist, binary.name, executable_names=sdk_executables)
         archive_hash = hashlib.sha256(archive.read_bytes()).hexdigest()
         (archive.parent / (archive.name + '.sha256')).write_text(archive_hash + '  ' + archive.name + '\n', encoding='utf-8')
-        print('Release-candidate built:', binary)
+        print('Product package built:', binary)
 
 
 if __name__ == '__main__':

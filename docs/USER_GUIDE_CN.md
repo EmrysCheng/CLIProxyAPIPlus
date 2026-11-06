@@ -1,6 +1,6 @@
 # CLIProxyAPIPlus 详细使用指南
 
-适用版本：**`0.4.0-rc.6` 候选版**。本文面向安装、配置和维护独立 Portable 实例的使用者；尚未完成全部生产验收。源码开发看[开发指南](DEVELOPMENT_CN.md)，验收范围看[发行检查清单](RELEASE_CHECKLIST_CN.md)。
+适用版本：**`0.4.0` 正式版**。本文面向安装、配置和维护独立 Portable 实例的使用者；尚未完成全部生产验收。源码开发看[开发指南](DEVELOPMENT_CN.md)，验收范围看[发行检查清单](RELEASE_CHECKLIST_CN.md)。
 
 ## 目录
 
@@ -33,7 +33,7 @@
 
 ### 2.1 准备文件
 
-从可信渠道取得经过核验的完整候选包，或自行按[开发指南](DEVELOPMENT_CN.md)构建。不要把原版 CLIProxyAPI EXE、Manager EXE 或单独 HTML 当成本项目安装包。当前候选状态不表示已有正式公开 Release。
+从可信渠道取得经过核验的完整安装包，或自行按[开发指南](DEVELOPMENT_CN.md)构建。不要把原版 CLIProxyAPI EXE、Manager EXE 或单独 HTML 当成本项目安装包。本次正式 Release 提供源码，不附带二进制安装包；请先按开发指南构建匹配的完整包，不能把 GitHub 自动生成的源码 ZIP 直接当安装包运行。
 
 典型解压目录：
 
@@ -373,4 +373,4 @@ python scripts/data.py import --binary <整合程序绝对路径> --native-confi
 - [ ] 定期检查 `main.log`、更新目录和磁盘空间；不要自动删除活动配方/回滚记录。
 - [ ] 升级前做外部备份，在副本演练恢复，并明确快照后数据的回滚影响。
 - [ ] 保留最小权限、访问边界和秘密管理；页面检查不等于自动安装许可。
-- [ ] 正式投产前逐项完成[发行检查清单](RELEASE_CHECKLIST_CN.md)，不以候选包或文档齐全替代生产验收。
+- [ ] 正式投产前逐项完成[发行检查清单](RELEASE_CHECKLIST_CN.md)，不以版本通道或文档齐全替代生产验收。
