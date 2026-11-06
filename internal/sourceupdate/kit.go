@@ -63,7 +63,7 @@ func safeKitName(name string) bool {
 func productKey(name string) bool {
 	first := strings.Split(name, "/")[0]
 	switch first {
-	case "cmd", "internal", "patches", "scripts", "tests", "go.mod", "VERSION", ".github", "Dockerfile", "compose.yaml", ".dockerignore", ".gitattributes", ".gitignore", "AGENTS.md", "README_CN.md", "THIRD_PARTY_NOTICES.md", "docs":
+	case "cmd", "internal", "patches", "scripts", "tests", "go.mod", "VERSION", ".github", "Dockerfile", "compose.yaml", ".dockerignore", ".gitattributes", ".gitignore", "AGENTS.md", "README.md", "README_CN.md", "THIRD_PARTY_NOTICES.md", "docs":
 		return true
 	}
 	return false
