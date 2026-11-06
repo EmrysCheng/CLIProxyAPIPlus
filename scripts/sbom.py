@@ -30,12 +30,31 @@ def collect_notices(directory:Path,destination:Path):
             copied.append({'file':str(target),'sha256':hashlib.sha256(target.read_bytes()).hexdigest()})
     return copied
 
+def notice_modules(go):
+    def listing():
+        return list(objects(subprocess.check_output([go,'list','-m','-json','all'],cwd=project.ROOT,text=True)))
+    modules=listing()
+    lock=json.loads((project.ROOT/'internal/sourceupdate/portable-notices.lock.json').read_text(encoding='utf-8'))
+    required={key for rules in lock['platforms'].values() for key,rule in rules.items() if rule['required']}
+    missing=[]
+    for module in modules:
+        effective=module.get('Replace',module)
+        version=effective.get('Version',module.get('Version','workspace'))
+        key=hashlib.sha256(('go:'+module['Path']+'@'+version).encode()).hexdigest()[:24]
+        # Fetch only pinned notices required by the reviewed inventory. Downloading
+        # the entire graph would add previously unreviewed notices from test modules.
+        if key in required and effective.get('Version') and not effective.get('Dir'):
+            missing.append(effective['Path']+'@'+effective['Version'])
+    if missing:
+        subprocess.run([go,'mod','download',*sorted(set(missing))],cwd=project.ROOT,check=True)
+        modules=listing()
+    return modules
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--go',default='go');parser.add_argument('--output',required=True);args=parser.parse_args()
     output=Path(args.output).resolve();output.mkdir(parents=True,exist_ok=True)
-    go_data=subprocess.check_output([args.go,'list','-m','-json','all'],cwd=project.ROOT,text=True)
     components=[]
-    for module in objects(go_data):
+    for module in notice_modules(args.go):
         effective=module.get('Replace',module);name=module['Path'];version=effective.get('Version',module.get('Version','workspace'))
         components.append({'ecosystem':'go','name':name,'version':version,'license':'NOASSERTION','directory':effective.get('Dir',module.get('Dir','')),'download':'https://'+effective['Path'] if effective.get('Path','').startswith(('github.com/','golang.org/','modernc.org/')) else 'NOASSERTION'})
     front=json.loads((project.BUILD/'frontend-current.json').read_text(encoding='utf-8'));work=Path(front['work'])
