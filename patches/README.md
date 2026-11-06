@@ -35,6 +35,20 @@ registry, ACK, cancellation and blocking-scope assertions remain. No runtime
 retry, cancellation bound, Home behavior or original snapshot is changed; no
 test is skipped. Repeat and delayed-bad-drain mutation evidence is required.
 
+## Auth batch fixture scheduling and cleanup
+
+The SDK auth-sync fixture preimage
+`344c34605eaeed67228b011b5a827dba07e0d49b6fab3ab27ad133f39872fb2f`
+assumes the second worker to enter a shared hook belongs to auth B. Workers can
+start in either order, so it can block auth A and fail its own independent-wait
+assertion. Its failure cleanup also releases B without joining the publishers,
+allowing late model registration to contaminate subsequent model-list tests.
+The test-only patch blocks B through the existing per-auth runtime fixture and
+joins both update goroutines before unregistering clients, including on failure.
+It retains the two-second deadlines and independent-wait assertion, and verifies
+that the batch remains blocked until B is released. No runtime code is changed
+and no test or race check is skipped.
+
 ## Response interrupt fixture timing contract
 
 The unchanged v8.0.55 OpenAI responses interrupt fixture preimage

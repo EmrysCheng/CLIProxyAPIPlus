@@ -101,6 +101,32 @@
     ]
   },
   {
+    "path": "sdk/cliproxy/service_auth_sync_test.go",
+    "sha256": "344c34605eaeed67228b011b5a827dba07e0d49b6fab3ab27ad133f39872fb2f",
+    "operations": [
+      {
+        "find": "\tbStarted := make(chan struct{})\n\tbBlock := make(chan struct{})\n\tvar started atomic.Int32\n\tmodelRegistrationTaskHook = func() {\n\t\tif started.Add(1) == 2 {\n\t\t\tclose(bStarted)\n\t\t\t<-bBlock\n\t\t}\n\t}\n\tt.Cleanup(func() {\n\t\tmodelRegistrationTaskHook = nil\n\t\tselect {\n\t\tcase <-bBlock:\n\t\tdefault:\n\t\t\tclose(bBlock)\n\t\t}\n\t})",
+        "replace": "\tbStarted := make(chan struct{})\n\tbBlock := make(chan struct{})\n\t// Worker start order is not auth order. Block B by identity, not by\n\t// counting entries into the shared worker hook.\n\tvar bBlocked atomic.Bool\n\tauthB.Runtime = &registrationInterleaveRuntime{onRead: func() {\n\t\tif bBlocked.CompareAndSwap(false, true) {\n\t\t\tclose(bStarted)\n\t\t\t<-bBlock\n\t\t}\n\t}}",
+        "count": 1
+      },
+      {
+        "find": "\tfinishedBatch := make(chan struct{})\n\tgo func() {\n\t\tdefer close(finishedBatch)\n\t\tservice.handleAuthUpdates(context.Background(), []watcher.AuthUpdate{updateA, updateB})",
+        "replace": "\tfinishedBatch := make(chan struct{})\n\tvar doneA chan struct{}\n\tt.Cleanup(func() {\n\t\tselect {\n\t\tcase <-bBlock:\n\t\tdefault:\n\t\t\tclose(bBlock)\n\t\t}\n\t\t// Join publishers before the earlier registry cleanup, including on Fatal.\n\t\t<-finishedBatch\n\t\tif doneA != nil {\n\t\t\t<-doneA\n\t\t}\n\t})\n\tgo func() {\n\t\tdefer close(finishedBatch)\n\t\tservice.handleAuthUpdates(context.Background(), []watcher.AuthUpdate{updateA, updateB})",
+        "count": 1
+      },
+      {
+        "find": "\tdoneA := make(chan struct{})",
+        "replace": "\tdoneA = make(chan struct{})",
+        "count": 1
+      },
+      {
+        "find": "\tclose(bBlock)\n\tselect {\n\tcase <-finishedBatch:",
+        "replace": "\tselect {\n\tcase <-finishedBatch:\n\t\tt.Fatal(\"batch finished before auth B was released\")\n\tdefault:\n\t}\n\tclose(bBlock)\n\tselect {\n\tcase <-finishedBatch:",
+        "count": 1
+      }
+    ]
+  },
+  {
     "path": "sdk/api/handlers/openai/openai_responses_interrupt_test.go",
     "sha256": "45b7d4a949dac4c04657176661b011606c5b0a6e1eb07e231e2ae02945f27f04",
     "operations": [
