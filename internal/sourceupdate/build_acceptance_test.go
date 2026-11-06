@@ -65,7 +65,7 @@ func TestBaselineSourceBuildPipeline(t *testing.T) {
 	}
 	baseline := expected["cliproxyapi"].Commit == identity.CoreCommit && expected["cpa-manager-plus"].Commit == identity.ManagerCommit
 	controller := New(opts, nil)
-	job := t.TempDir()
+	job := sourceAcceptanceJob(t)
 	defer func() {
 		if log, err := os.ReadFile(filepath.Join(job, "source-build.log")); err == nil {
 			_ = os.WriteFile(filepath.Join(filepath.Dir(reportPath), "logs", "source-updates-full-source-build.log"), log, 0600)
