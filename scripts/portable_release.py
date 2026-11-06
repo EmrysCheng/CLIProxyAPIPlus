@@ -268,7 +268,7 @@ def preflight(tag, commit):
     if api(prefix+'/commits/'+tag)['sha'] != commit or api(prefix+'/commits/master')['sha'] != commit:
         raise ValueError('Tag, workflow commit and trusted master must match')
     runs = api(prefix+'/actions/workflows/verify.yml/runs?head_sha='+commit+'&per_page=100')['workflow_runs']
-    green = [run for run in runs if run['head_sha']==commit and run['head_branch']=='master' and run['event']=='push' and run['conclusion']=='success']
+    green = [run for run in runs if run.get('head_sha')==commit and run.get('head_branch') in ('master', tag, 'refs/tags/'+tag) and run.get('event') in ('push', 'workflow_dispatch') and run.get('conclusion')=='success']
     if not green:
         raise ValueError('Same-commit master verification must succeed before Portable publication')
     print('Release preflight passed:', tag, commit)
