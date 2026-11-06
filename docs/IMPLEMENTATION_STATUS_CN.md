@@ -1,10 +1,10 @@
 # CLIProxyAPIPlus 实施状态
 
-更新日期：**2026-11-06（Asia/Shanghai）**。当前版本为 **`0.4.0`，正式源码发行**。版本通道、可下载附件和生产部署验收分别记录：本次不附带未完成发布签收的二进制包，不宣称全部生产门禁已通过。
+更新日期：**2026-11-06（Asia/Shanghai）**。当前版本为 **`0.4.1`**。补齐 Windows amd64、Linux amd64、Linux arm64 的原生 Portable 打包、校验和受控发布流程；具体附件以 Release 为准。不宣称全部真实业务和生产门禁已通过。
 
 - [使用指南](https://github.com/EmrysCheng/CLIProxyAPIPlus/blob/master/docs/USER_GUIDE_CN.md)
 - [双上游源码自更新](SOURCE_UPDATES_CN.md)
-- [v0.4.0 发布说明](https://github.com/EmrysCheng/CLIProxyAPIPlus/releases/tag/v0.4.0)
+- [v0.4.1 发布说明](https://github.com/EmrysCheng/CLIProxyAPIPlus/releases/tag/v0.4.1)
 - [发行与生产部署验收清单](RELEASE_CHECKLIST_CN.md)
 
 ## 1. 已实现的整合能力
@@ -73,7 +73,9 @@
 
 公开 Git 仅保存产品、补丁和固定锁，不提交原始 `upstream/` 快照、运行数据、秘密或私有报告。首次克隆用 `python scripts/hydrate_upstreams.py` 补齐官方固定提交，核对树摘要、模块身份和 LICENSE；已有快照不覆盖。
 
-本次以 `v0.4.0` 正式源码 Release 发布，不把未签收二进制或含完整上游配方的归档作为附件。公开 CI 也只按精确白名单导出验证元数据。未来公开完整安装包须单独满足再分发及平台验收，不能仅凭去掉版本后缀认定完成。
+`v0.4.0` 保留为历史源码发行。`v0.4.1` 的独立手动发行流程要求同提交 master 验证成功、三个原生平台包齐全、SDK/源码配方/二进制/归档摘要一致；以 draft 收齐附件后才公开。普通验证及上游候选仍只导出元数据，不公开运行数据或原始日志。包内保留许可、SBOM 与合规资料，但这不等于所有许可或真实生产场景均已获签收。
+
+本轮修复 Linux race 的包级时间预算（保留 race 和原用例断言），补充源码构建失败的白名单诊断；Windows 离线恢复遇到短暂文件读者时只进行有界等待，不改变 ACL、不覆盖已有目录。新版本的实际结果以对应提交 CI 和 `release-manifest.json` 为准；上节历史失败不改写为通过。
 
 ## 6. 历史记录
 

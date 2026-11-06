@@ -1,6 +1,6 @@
 # CLIProxyAPIPlus 详细使用指南
 
-适用版本：**`0.4.0` 正式版**。本文面向安装、配置和维护独立 Portable 实例的使用者；尚未完成全部生产验收。源码开发看[开发指南](DEVELOPMENT_CN.md)，验收范围看[发行检查清单](RELEASE_CHECKLIST_CN.md)。
+适用版本：**`0.4.1` 正式版**。本文面向安装、配置和维护独立 Portable 实例的使用者；尚未完成全部生产验收。源码开发看[开发指南](DEVELOPMENT_CN.md)，验收范围看[发行检查清单](RELEASE_CHECKLIST_CN.md)。
 
 ## 目录
 
@@ -33,7 +33,7 @@
 
 ### 2.1 准备文件
 
-从可信渠道取得经过核验的完整安装包，或自行按[开发指南](DEVELOPMENT_CN.md)构建。不要把原版 CLIProxyAPI EXE、Manager EXE 或单独 HTML 当成本项目安装包。本次正式 Release 提供源码，不附带二进制安装包；请先按开发指南构建匹配的完整包，不能把 GitHub 自动生成的源码 ZIP 直接当安装包运行。
+从可信渠道取得经过核验的完整安装包，或自行按[开发指南](DEVELOPMENT_CN.md)构建。不要把原版 CLIProxyAPI EXE、Manager EXE 或单独 HTML 当成本项目安装包。从 [v0.4.1 发行页](https://github.com/EmrysCheng/CLIProxyAPIPlus/releases/tag/v0.4.1) 下载 `windows_amd64_portable.zip`、`linux_amd64_portable.tar.gz` 或 `linux_arm64_portable.tar.gz`。同时下载对应 `.sha256` 并核对；平台选择及校验命令见[首页](../README.md#1-准备完整-portable-目录)。不能把 GitHub 自动生成的源码 ZIP 直接当安装包运行；不支持的系统/架构不能混用程序包。
 
 典型解压目录：
 

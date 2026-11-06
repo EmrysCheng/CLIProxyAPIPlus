@@ -1,8 +1,8 @@
 # 开发、构建与上游维护
 
-适用版本：`0.4.0`（正式源码发行）。本指南描述仓库提供的构建与验证入口，不代表所有平台、供应商或生产环境已通过验收。使用部署看[用户指南](USER_GUIDE_CN.md)，交付门禁看[发行检查清单](RELEASE_CHECKLIST_CN.md)。
+适用版本：`0.4.1`。本指南描述仓库提供的构建与验证入口，不代表所有平台、供应商或生产环境已通过验收。使用部署看[用户指南](USER_GUIDE_CN.md)，交付门禁看[发行检查清单](RELEASE_CHECKLIST_CN.md)。
 
-本次 [v0.4.0](releases/v0.4.0.md) 以源码发行；二进制安装包仍需完成单独的再分发和平台签收。
+本次 [v0.4.1](releases/v0.4.1.md) 增加三个原生目标的完整 Portable 发行链路；工程验证不替代具体业务、安全、许可和生产部署签收。
 
 ## 1. 仓库结构与修改边界
 
@@ -190,7 +190,12 @@ python scripts/upstreams.py recover --journal <promotion-journal>
 
 - `verify.yml` 验证三平台 Portable 与 Linux Full 的配置范围；具体是否通过应查看当前提交的实际工作流。
 - `upstream-candidate.yml` 定时或手动建立、验证候选，不自动 promote、提交或发布。
-- 公开 artifact 白名单只允许构建身份/校验和及候选验证元数据，不上传完整安装包、原始上游源码或宽泛日志目录。
+- 普通验证 / 候选 artifact 仍只允许构建身份、校验和及候选元数据，不上传完整安装包或宽泛日志。
+- `portable-release.yml` 仅允许从本仓库 `master` 手动触发。先提交全部代码/文档，等待该提交的 `verify.yml` 全部通过，再创建不可变正式标签（与 `VERSION` 一致），在 Actions 的 **Publish native Portable packages** 选择 `master`，填写如 `v0.4.1` 后运行。标签、运行提交和 master 必须一致。
+- 三个平台原生构建、SDK/配方验证、程序及维护 smoke 全部通过后，只有独立 publish job 获得 `contents: write`；上游 Go/npm/测试仅用只读权限。发布者重新逐文件校验归档，不执行包内代码。
+- 三个平台包、SHA256 和脱敏回执先传入 draft，附件齐全且摘要一致后才公开。同名同摘要跳过，不同摘要或已公开 Release 缺附件则拒绝覆盖；失败时在同一次 run 使用 **Re-run failed jobs**，不重新构建/覆盖已上传的不同字节资产。
+- 正式目标包括 Windows amd64、Linux amd64、Linux arm64；增加新系统必须同时增加可信 SDK 锁、原生 runner、验证与发行资产约束，不能只改文件名。
+- `internal/sourceupdate/portable-notices.lock.json` 按目标平台和组件身份固定依赖声明及 notice 的 required/optional 路径和内容摘要，要求 R ⊆ S ⊆ R ∪ O；不能删掉 required，也不能把另一组件的许可证挪用过来。运行程序链接的 Go 模块和非可选的前端依赖保留必需 notice；测试专用 Go 模块、可选原生 npm 包及其平台差异只按锁中显式 optional 清单接受。归档内 `licenses-index.json` 不是任意文件的信任来源。新增平台或更新依赖若出现未审阅的 notice 摘要，发行失败关闭；需对照固定依赖官方内容审阅后更新锁，不能将私有日志改名放入 licenses 或直接放宽白名单。
 - 不向上游候选测试或 PR 工作流提供生产凭据/发布 token；不使用不可信源码配合 `pull_request_target` 获得权限。
 - 第三方原始源码、OAuth 常量、依赖许可/缺失 notice/漏洞与整包再分发仍须单独审查。Git 推送成功不等于得到正式发布许可。
 

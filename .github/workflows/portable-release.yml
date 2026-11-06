@@ -1,0 +1,113 @@
+name: Publish native Portable packages
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing stable tag at this master commit (vX.Y.Z)'
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: portable-release-${{ inputs.tag }}
+  cancel-in-progress: false
+jobs:
+  preflight:
+    if: github.ref == 'refs/heads/master' && github.repository == 'EmrysCheng/CLIProxyAPIPlus'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Require stable tag and successful same-commit verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: python scripts/portable_release.py preflight
+  build:
+    needs: preflight
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            target: windows/amd64
+            artifact: windows-amd64
+          - runner: ubuntu-24.04
+            target: linux/amd64
+            artifact: linux-amd64
+          - runner: ubuntu-24.04-arm
+            target: linux/arm64
+            artifact: linux-arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    env:
+      PYTHONUTF8: '1'
+      GOMAXPROCS: '4'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: '1.26.10'
+          cache: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - run: python scripts/hydrate_upstreams.py
+      - run: python scripts/project.py build --target ${{ matrix.target }}
+      - run: python scripts/project.py test-source
+      - run: python scripts/smoke_binary.py
+      - run: python scripts/smoke_maintenance.py
+      - name: Validate complete package and stage public-safe assets
+        run: python scripts/portable_release.py stage --target ${{ matrix.target }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: portable-${{ matrix.artifact }}
+          path: |
+            .build/release-assets/*.zip
+            .build/release-assets/*.tar.gz
+            .build/release-assets/*.sha256
+            .build/release-assets/*.json
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+  publish:
+    needs: [preflight, build]
+    if: github.ref == 'refs/heads/master' && github.repository == 'EmrysCheng/CLIProxyAPIPlus'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      # Only hash-checked official source is read here; never run upstream/asset code with write permissions.
+      - run: python scripts/hydrate_upstreams.py
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: portable-*
+          merge-multiple: true
+          path: .build/release-assets
+      - name: Verify every platform, upload to draft, publish atomically
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: python scripts/portable_release.py publish

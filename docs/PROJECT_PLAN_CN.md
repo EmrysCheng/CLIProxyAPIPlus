@@ -1,4 +1,4 @@
-> 本文保留 2026-11-03 的设计计划与当时调研事实，不代表当前所有验收已通过。当前版本为 `0.4.0` 正式源码发行；实际交付范围见 [IMPLEMENTATION_STATUS_CN.md](IMPLEMENTATION_STATUS_CN.md)，发布内容见 [releases/v0.4.0.md](releases/v0.4.0.md)。
+> 本文保留 2026-11-03 的设计计划与当时调研事实，不代表当前所有验收已通过。当前版本为 `0.4.1` Portable 发行；实际交付范围见 [IMPLEMENTATION_STATUS_CN.md](IMPLEMENTATION_STATUS_CN.md)，发布内容见 [releases/v0.4.1.md](releases/v0.4.1.md)。
 
 > 2026-11-04 构建工具交付调整：Python、Go、Node、npm 随目标平台安装包分发，用户无需下载 SDK；默认校验并使用包内工具。打包端按固定归档 SHA256 获取工具，源码更新复用本地内置工具，仍须联网获取上游源码与项目依赖，不额外启动发行服务。
 

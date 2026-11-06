@@ -13,6 +13,8 @@ import os
 from pathlib import Path, PurePosixPath
 import shutil
 import sqlite3
+import stat
+import time
 import subprocess
 import sys
 import uuid
@@ -145,6 +147,31 @@ def verify(snapshot_path:Path):
             if digest.hexdigest()!=record['sha256'] or size!=record['bytes']:raise ValueError('Snapshot checksum mismatch: '+name)
         return manifest
 
+def _publish_restore_directory(source:Path,destination:Path):
+    """Wait briefly for Windows readers, never weaken ACLs or replace a target.
+
+    A reader of any restored child file without FILE_SHARE_DELETE can make the
+    parent rename fail with WinError 5 (or 32/33). Other failures are not retried.
+    Persistent denial still fails closed after six attempts (1.55s total waits).
+    """
+    initial=source.lstat()
+    identity=(initial.st_dev,initial.st_ino)
+    for attempt in range(6):
+        if os.path.lexists(destination):
+            raise FileExistsError('Restore destination appeared; existing data is never overwritten')
+        current=source.lstat()
+        if (not stat.S_ISDIR(current.st_mode) or stat.S_ISLNK(current.st_mode)
+                or getattr(current,'st_file_attributes',0)&0x400
+                or (current.st_dev,current.st_ino)!=identity):
+            raise ValueError('Restore staging directory changed while waiting')
+        try:
+            source.rename(destination)
+            return
+        except OSError as error:
+            if os.name!='nt' or getattr(error,'winerror',None) not in (5,32,33) or attempt==5:
+                raise
+            time.sleep(0.05*(2**attempt))
+
 def restore(snapshot_path:Path,data:Path,config:Path,binary:Path,relocate=True):
     manifest=verify(snapshot_path);data=data.resolve();config=config.resolve()
     if data.exists() or config.exists():raise ValueError('Restore requires new data and configuration paths; existing data is never overwritten')
@@ -157,7 +184,7 @@ def restore(snapshot_path:Path,data:Path,config:Path,binary:Path,relocate=True):
             with archive.open(name) as src,destination.open('xb') as dst:shutil.copyfileobj(src,dst)
             os.chmod(destination,0o600)
     # Publish only verified data. The native helper preserves YAML layout and secrets.
-    (stage/'data').rename(data)
+    _publish_restore_directory(stage/'data',data)
     private_config=config.parent/('.restore-config-'+uuid.uuid4().hex);private_config.mkdir(mode=0o700);private.protect(private_config,True)
     incoming=private_config/'config.yaml';shutil.copyfile(stage/'config.yaml',incoming)
     with config.open('xb'):pass

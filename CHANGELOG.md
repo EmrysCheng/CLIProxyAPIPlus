@@ -1,5 +1,13 @@
 # 更新记录
 
+## [0.4.1](https://github.com/EmrysCheng/CLIProxyAPIPlus/releases/tag/v0.4.1) — 2026-11-06
+
+- 补齐 Windows amd64、Linux amd64、Linux arm64 完整 Portable 发行链路、归档 SHA256 和原生验证回执。
+- 区分普通验证与显式发布权限，三包齐全且校验通过后才公开 draft，不覆盖已公开版本。
+- Linux race 包级预算增加，保留测试、数据规模和断言；Windows 恢复仅对短暂文件占用进行有界等待。
+- 补充源码构建失败白名单诊断；更新 README 下载入口、平台选择、校验与解压说明。
+- 保留 v0.4.0 的源码发行事实；工程门禁不等于全部真实生产验收。
+
 ## [0.4.0](https://github.com/EmrysCheng/CLIProxyAPIPlus/releases/tag/v0.4.0) — 2026-11-06
 
 首个正式版本号的源码发行，不附带未完成签收的二进制安装包。

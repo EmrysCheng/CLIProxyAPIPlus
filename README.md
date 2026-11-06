@@ -2,7 +2,7 @@
 
 将 [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) 与 [CPA-Manager-Plus](https://github.com/seakee/CPA-Manager-Plus) 在源码层面整合：**一个 Go 程序、一个对外业务端口，使用 CPA-Manager-Plus 原有前端**。
 
-> **当前版本：`0.4.0`，正式源码发行。** [发布说明与源码下载](https://github.com/EmrysCheng/CLIProxyAPIPlus/releases/tag/v0.4.0)。本次不附带未完成发布签收的二进制安装包或公共镜像；Windows 完整源码构建和 Linux Full/race 仍有已知 CI 失败，详见[发布说明](docs/releases/v0.4.0.md)。正式版本号不表示全部生产场景已验收，部署前请核对[发行与生产部署验收清单](docs/RELEASE_CHECKLIST_CN.md)。
+> **当前版本：`0.4.1`。** [Portable 发行页](https://github.com/EmrysCheng/CLIProxyAPIPlus/releases/tag/v0.4.1) · [本次发行说明](docs/releases/v0.4.1.md)。Windows amd64、Linux amd64、Linux arm64 使用不同的完整程序包；请下载下表中的 Portable 附件，不要下载 GitHub 自动生成的 Source code 归档作为安装包。正式版本号不表示所有真实业务与生产门禁已验收，范围见[验收清单](docs/RELEASE_CHECKLIST_CN.md)。
 
 [更新记录](CHANGELOG.md) · [使用指南](docs/USER_GUIDE_CN.md) · [页面升级与回滚](docs/SOURCE_UPDATES_CN.md) · [开发与构建](docs/DEVELOPMENT_CN.md) · [文档目录](docs/README.md)
 
@@ -40,7 +40,15 @@
 
 ### 1. 准备完整 Portable 目录
 
-构建目标包括 `windows/amd64`、`linux/amd64`、`linux/arm64`。平台可打包不代表已经完成该平台原生生产验收。Linux 内置构建工具要求 glibc 2.28+，不是 Alpine/musl 版本。
+| 操作系统 / 架构 | Portable 下载 | 适用设备 |
+| --- | --- | --- |
+| Windows x64（amd64） | [CLIProxyAPIPlus_0.4.1_windows_amd64_portable.zip](https://github.com/EmrysCheng/CLIProxyAPIPlus/releases/download/v0.4.1/CLIProxyAPIPlus_0.4.1_windows_amd64_portable.zip) | 64 位 Intel / AMD Windows |
+| Linux x64（amd64） | [CLIProxyAPIPlus_0.4.1_linux_amd64_portable.tar.gz](https://github.com/EmrysCheng/CLIProxyAPIPlus/releases/download/v0.4.1/CLIProxyAPIPlus_0.4.1_linux_amd64_portable.tar.gz) | `uname -m` 为 `x86_64` |
+| Linux ARM64（arm64） | [CLIProxyAPIPlus_0.4.1_linux_arm64_portable.tar.gz](https://github.com/EmrysCheng/CLIProxyAPIPlus/releases/download/v0.4.1/CLIProxyAPIPlus_0.4.1_linux_arm64_portable.tar.gz) | `uname -m` 为 `aarch64` / `arm64` |
+
+本次支持上述三个目标，不包含 macOS、Windows ARM64、Linux 32 位或 Alpine/musl；Linux 内置构建工具要求 glibc 2.28+。请按系统和 CPU 架构选择，不要把 Windows 包复制到 Linux。
+
+同时下载对应的 `.sha256` 附件或 `SHA256SUMS`。Windows 使用 `Get-FileHash .\CLIProxyAPIPlus_0.4.1_windows_amd64_portable.zip -Algorithm SHA256`，与附件中的 64 位摘要逐字比对；Linux 将所选包与同名 `.sha256` 放在同一目录，执行 `sha256sum -c CLIProxyAPIPlus_0.4.1_linux_amd64_portable.tar.gz.sha256`（ARM64 替换架构名）。摘要一致后再解压。Linux 执行 `tar -xzf <包名>.tar.gz -C <新建的安装目录>`；解压保留执行权限。
 
 从受信任渠道取得**完整匹配的安装包**，或按[源码构建指南](docs/DEVELOPMENT_CN.md)生成。保留程序旁的 `build-tools/`、`update-tools.json`、`updater-source/`，不要只复制 EXE。以下命令均在解压后的安装目录执行。
 
@@ -116,7 +124,7 @@ python scripts/project.py build
 - 配置热更新不允许修改监听器、TLS、认证目录、内部管理密钥或开启额外监听器。
 - 源码更新会执行经管理员确认的上游构建代码。隔离目录和摘要校验**不是 OS 安全沙箱**；请使用专用最小权限账户。
 - 不公开 `config.yaml`、`data/`、密钥、备份或 `<data-dir>.updates/`；后者可能包含回滚数据和后续更新所需的活动配方。
-- 公开 CI 仅导出白名单验证元数据，不自动上传完整源码、安装包或原始日志。正式发布仍须完成安全、许可和生产验收门禁。
+- 普通验证 / 上游候选 CI 仍只导出白名单元数据。Portable 仅由手动发行流程在同提交验证通过、三个原生平台包齐全并核验后公开；不上传运行数据或原始日志。工程验证与安全、许可、具体生产环境签收分别记录。
 
 ## 文档与反馈
 
