@@ -77,7 +77,7 @@ func TestBaselineSourceBuildPipeline(t *testing.T) {
 		if rawLog, readErr := os.ReadFile(filepath.Join(job, "source-build.log")); readErr == nil {
 			if _, sourceFile, _, ok := runtime.Caller(0); ok {
 				goNames, pythonNames := knownDiagnosticTestNames(filepath.Clean(filepath.Join(filepath.Dir(sourceFile), "..", "..")))
-				summary := buildFailureDiagnostics(rawLog, goNames, pythonNames)
+				summary := buildFailureDiagnostics(rawLog, goNames, pythonNames, knownDiagnosticScriptFrames(filepath.Clean(filepath.Join(filepath.Dir(sourceFile), "..", ".."))))
 				encoded, _ := json.Marshal(summary)
 				t.Logf("source-build failure diagnostics (source identifiers only): %s", encoded)
 			}

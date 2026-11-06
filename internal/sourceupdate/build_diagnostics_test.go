@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -49,6 +50,7 @@ func TestBuildFailureDiagnosticsStayBounded(t *testing.T) {
 // Public CI diagnostics contain only identifiers already declared in the reviewed
 // product test sources, never raw output, subtest values, paths or environment.
 type buildDiagnosticSummary struct {
+	ScriptFrames    []string `json:"script_frames,omitempty"`
 	GoTests         []string `json:"go_tests,omitempty"`
 	PythonTests     []string `json:"python_tests,omitempty"`
 	ObservedSignals []string `json:"observed_signals,omitempty"`
@@ -98,7 +100,7 @@ func knownDiagnosticTestNames(root string) (map[string]bool, map[string]bool) {
 	return goNames, pythonNames
 }
 
-func buildFailureDiagnostics(raw []byte, knownGo, knownPython map[string]bool) buildDiagnosticSummary {
+func buildFailureDiagnostics(raw []byte, knownGo, knownPython map[string]bool, frameAllowlist ...map[string]bool) buildDiagnosticSummary {
 	names := func(pattern *regexp.Regexp, known map[string]bool) []string {
 		seen := map[string]bool{}
 		for _, match := range pattern.FindAllSubmatch(raw, -1) {
@@ -118,6 +120,16 @@ func buildFailureDiagnostics(raw []byte, knownGo, knownPython map[string]bool) b
 		return result
 	}
 	summary := buildDiagnosticSummary{GoTests: names(goFailureName, knownGo), PythonTests: names(pythonFailureName, knownPython)}
+	if len(frameAllowlist) > 0 {
+		seen := map[string]bool{}
+		for _, match := range scriptTracebackFrame.FindAllSubmatch(raw, -1) {
+			key := string(match[1]) + ":" + string(match[2]) + ":" + string(match[3])
+			if frameAllowlist[0][key] && !seen[key] && len(summary.ScriptFrames) < 16 {
+				summary.ScriptFrames = append(summary.ScriptFrames, key)
+				seen[key] = true
+			}
+		}
+	}
 	text := string(raw)
 	for _, signal := range []struct{ marker, code string }{
 		{"panic: test timed out after", "go_test_timeout"},
@@ -194,4 +206,39 @@ func TestBuildFailureDiagnosticsClassifySetupErrorsWithoutPublishingOutput(t *te
 	if strings.Contains(text, "private") || strings.Contains(text, "secret") {
 		t.Fatal("raw output was exposed")
 	}
+}
+
+func TestBuildFailureDiagnosticsOnlyExposeWhitelistedScriptFrames(t *testing.T) {
+	raw := []byte("  File \"C:\\private\\scripts\\project.py\", line 183, in run\n  File \"C:\\private\\scripts\\secret.py\", line 1, in private_value\n")
+	summary := buildFailureDiagnostics(raw, nil, nil, map[string]bool{"project.py:183:run": true})
+	encoded, _ := json.Marshal(summary)
+	text := string(encoded)
+	if !strings.Contains(text, "project.py:183:run") || strings.Contains(text, "private") || strings.Contains(text, "secret") {
+		t.Fatalf("unsafe or missing frame: %s", text)
+	}
+}
+
+// Only literal filenames/functions/line numbers already present in the public
+// reviewed source can appear. Never return traceback paths or source text.
+var scriptTracebackFrame = regexp.MustCompile(`File "[^"\r\n]*[\\/]scripts[\\/]([A-Za-z0-9_]+\.py)", line ([0-9]{1,5}), in ([A-Za-z0-9_]+|<module>)`)
+var declaredScriptFunction = regexp.MustCompile(`(?m)^def ([A-Za-z0-9_]+)\(`)
+
+func knownDiagnosticScriptFrames(root string) map[string]bool {
+	result := map[string]bool{}
+	for _, name := range []string{"project.py", "upstreams.py", "web_source_update.py"} {
+		raw, err := os.ReadFile(filepath.Join(root, "scripts", name))
+		if err != nil {
+			continue
+		}
+		functions := []string{"<module>"}
+		for _, match := range declaredScriptFunction.FindAllSubmatch(raw, -1) {
+			functions = append(functions, string(match[1]))
+		}
+		for index := range strings.Split(string(raw), "\n") {
+			for _, function := range functions {
+				result[name+":"+strconv.Itoa(index+1)+":"+function] = true
+			}
+		}
+	}
+	return result
 }
