@@ -63,10 +63,10 @@ class PortableArchiveIntegrityTests(unittest.TestCase):
 
     def fixture(self, target):
         binary = 'cliproxyapi-plus.exe' if target.startswith('windows/') else 'cliproxyapi-plus'
-        content = {name:b'public documentation' for name in ['README_CN.md','THIRD_PARTY_NOTICES.md'] + ['docs/'+x for x in release.DOCS] + ['tools/'+x for x in release.TOOLS]}
+        content = {name:b'public documentation' for name in ['README.md','THIRD_PARTY_NOTICES.md'] + ['docs/'+x for x in release.DOCS] + ['tools/'+x for x in release.TOOLS]}
         content.update({binary:b'fixture-program','upstream.lock.json':b'{"projects":{}}','update-tools.example.json':b'{}','compliance-report.json':b'{}','licenses-index.json':b'[]','sbom.spdx.json':b'{}','licenses/cliproxyapi-LICENSE.txt':b'MIT','licenses/cpa-manager-plus-LICENSE.txt':b'MIT','licenses/BUNDLED_TOOLS_CN.md':b'SDK notices'})
         sha = lambda value:hashlib.sha256(value).hexdigest()
-        records = {name if not name.startswith('tools/') else name.replace('tools/','scripts/',1):sha(value) for name,value in content.items() if name.startswith(('docs/','tools/')) or name in ['README_CN.md','THIRD_PARTY_NOTICES.md','upstream.lock.json']}
+        records = {name if not name.startswith('tools/') else name.replace('tools/','scripts/',1):sha(value) for name,value in content.items() if name.startswith(('docs/','tools/')) or name in ['README.md','THIRD_PARTY_NOTICES.md','upstream.lock.json']}
         records.update({'upstream/cliproxyapi/LICENSE':sha(b'MIT'),'upstream/cpa-manager-plus/LICENSE':sha(b'MIT')})
         recipe = {'schema_version':1,'product_source_sha256':'a'*64,'upstream_lock_sha256':sha(content['upstream.lock.json']),'product_records':{},'records':records}
         for name,value in records.items():
@@ -104,7 +104,7 @@ class PortableArchiveIntegrityTests(unittest.TestCase):
                 self.assertEqual(checked['archive_sha256'],release.digest(path))
 
     def test_sdk_recipe_program_and_default_config_tampering_fail(self):
-        for name in ['build-tools/go/bin/go.exe','updater-source/README_CN.md','updater-source/source-kit.json','cliproxyapi-plus.exe','update-tools.json','README_CN.md']:
+        for name in ['build-tools/go/bin/go.exe','updater-source/README.md','updater-source/source-kit.json','cliproxyapi-plus.exe','update-tools.json','README.md']:
             with self.subTest(name=name), tempfile.TemporaryDirectory() as temp:
                 content,recipe,pin,executables=self.fixture('windows/amd64')
                 content[name]=b'{}'

@@ -23,7 +23,7 @@ import project
 from build_progress import step
 
 ROOT=project.ROOT
-PRODUCT_PATHS=['cmd','internal','patches','scripts','tests','go.mod','VERSION','.github','Dockerfile','compose.yaml','.dockerignore','.gitattributes','.gitignore','AGENTS.md','README_CN.md','THIRD_PARTY_NOTICES.md','docs']
+PRODUCT_PATHS=['cmd','internal','patches','scripts','tests','go.mod','VERSION','.github','Dockerfile','compose.yaml','.dockerignore','.gitattributes','.gitignore','AGENTS.md','README.md','THIRD_PARTY_NOTICES.md','docs']
 
 def read_json(path):return json.loads(path.read_text(encoding='utf-8'))
 def save_json(path,data):path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')

@@ -104,7 +104,7 @@ def inspect_package(archive, target, version, recipe, toolchain_pin):
     if archive.stat().st_size > 512 << 20:
         raise ValueError('Portable archive exceeds compressed size limit')
     binary = 'cliproxyapi-plus.exe' if target.startswith('windows/') else 'cliproxyapi-plus'
-    fixed = {binary, 'build-info.json', 'checksums.txt', 'update-tools.json', 'update-tools.example.json', 'upstream.lock.json', 'README_CN.md', 'THIRD_PARTY_NOTICES.md', 'compliance-report.json', 'licenses-index.json', 'sbom.spdx.json'}
+    fixed = {binary, 'build-info.json', 'checksums.txt', 'update-tools.json', 'update-tools.example.json', 'upstream.lock.json', 'README.md', 'THIRD_PARTY_NOTICES.md', 'compliance-report.json', 'licenses-index.json', 'sbom.spdx.json'}
     fixed.update({'licenses/cliproxyapi-LICENSE.txt', 'licenses/cpa-manager-plus-LICENSE.txt', 'licenses/BUNDLED_TOOLS_CN.md'})
     fixed.update('docs/' + name for name in DOCS)
     fixed.update('tools/' + name for name in TOOLS)
@@ -175,7 +175,7 @@ def inspect_package(archive, target, version, recipe, toolchain_pin):
         raise ValueError('Packaged upstream lock mismatch')
     if public_json(small['update-tools.json']) != {'bundle': './build-tools', 'go_proxy': 'https://goproxy.cn|https://proxy.golang.org'}:
         raise ValueError('Bundled update tools default mismatch')
-    for packaged, source in [('README_CN.md','README_CN.md'), ('THIRD_PARTY_NOTICES.md','THIRD_PARTY_NOTICES.md')] + [('docs/'+name,'docs/'+name) for name in DOCS] + [('tools/'+name,'scripts/'+name) for name in TOOLS]:
+    for packaged, source in [('README.md','README.md'), ('THIRD_PARTY_NOTICES.md','THIRD_PARTY_NOTICES.md')] + [('docs/'+name,'docs/'+name) for name in DOCS] + [('tools/'+name,'scripts/'+name) for name in TOOLS]:
         if hashes[packaged] != recipe['records'].get(source):
             raise ValueError('Packaged documentation/tool drift: ' + packaged)
     verify_licenses(hashes,small['licenses-index.json'],recipe,target)

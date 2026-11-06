@@ -433,7 +433,7 @@ def main():
             shutil.copyfile(path / 'LICENSE', licenses / (name + '-LICENSE.txt'))
         shutil.copyfile(ROOT / 'upstream.lock.json', dist / 'upstream.lock.json')
         shutil.copyfile(ROOT / 'THIRD_PARTY_NOTICES.md', dist / 'THIRD_PARTY_NOTICES.md')
-        shutil.copyfile(ROOT / 'README_CN.md', dist / 'README_CN.md')
+        shutil.copyfile(ROOT / 'README.md', dist / 'README.md')
         (dist / 'tools').mkdir(exist_ok=True)
         for name in ['data.py', 'upgrade.py', 'private.py', 'archive_paths.py']:
             shutil.copyfile(ROOT / 'scripts' / name, dist / 'tools' / name)

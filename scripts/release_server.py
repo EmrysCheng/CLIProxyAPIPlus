@@ -51,7 +51,7 @@ def build(args, env):
     if goos != 'windows':
         binary.chmod(0o755)
         (stage / 'start.sh').chmod(0o755)
-    shutil.copyfile(project.ROOT / 'docs/RELEASE_SERVER_CN.md', stage / 'README_CN.md')
+    shutil.copyfile(project.ROOT / 'docs/RELEASE_SERVER_CN.md', stage / 'README.md')
     goroot = Path(subprocess.check_output([args.go, 'env', 'GOROOT'], env=env, text=True).strip())
     (stage / 'licenses').mkdir()
     shutil.copyfile(goroot / 'LICENSE', stage / 'licenses/Go-LICENSE.txt')

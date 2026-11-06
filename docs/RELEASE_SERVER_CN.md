@@ -11,7 +11,7 @@ CLIProxyAPIPlus_ReleaseServer_<版本>_<系统>_<架构>_portable.zip / .tar.gz
   cliproxyapi-plus-release-server.exe    # Linux 无 .exe 后缀
   release-server.json
   start.cmd                             # Linux 为可执行 start.sh
-  README_CN.md
+  README.md
   build-info.json
   checksums.txt
   THIRD_PARTY_NOTICES.md
