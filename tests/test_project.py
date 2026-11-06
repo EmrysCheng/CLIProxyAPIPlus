@@ -208,6 +208,19 @@ class BuildIntegrityTests(unittest.TestCase):
             self.assertEqual(original.decode().split(signature,1)[1].split('\nfunc ',1)[1],
                              text.split(signature,1)[1].split('\nfunc ',1)[1])
 
+    def test_responses_interrupt_fixture_waits_for_asynchronous_stream_cancellation(self):
+        name='sdk/api/handlers/openai/openai_responses_interrupt_test.go'
+        changes=json.loads((project.ROOT/'patches/cliproxyapi/changes.json').read_text())
+        change=next(item for item in changes if item['path']==name)
+        original=(project.ROOT/'upstream/cliproxyapi'/name).read_bytes()
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);target=root/name;target.parent.mkdir(parents=True)
+            target.write_bytes(original);project.apply_changes(root,[change])
+            text=target.read_text()
+            self.assertNotIn('t.Skip',text)
+            self.assertIn('for deadline := time.Now().Add(2 * time.Second); !executor.canceled.Load() && time.Now().Before(deadline);',text)
+            self.assertIn('t.Fatal("http upstream was not canceled")',text)
+
     def test_locked_official_source_trees_are_unchanged(self):
         lock=project.lockfile()
         for name,item in lock['projects'].items():

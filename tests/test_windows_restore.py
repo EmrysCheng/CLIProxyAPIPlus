@@ -24,7 +24,7 @@ class WindowsRestoreSharingTests(unittest.TestCase):
         kernel.CloseHandle.argtypes = [wintypes.HANDLE]
         kernel.CloseHandle.restype = wintypes.BOOL
         with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
+            root = Path(temporary).resolve()
             original = root / 'original'
             (original / 'auths').mkdir(parents=True)
             (original / 'data.key').write_text('fixture-key', encoding='utf-8')
@@ -42,7 +42,7 @@ class WindowsRestoreSharingTests(unittest.TestCase):
             timers = []
             attempts = []
             def contended_rename(source, destination):
-                if source.name == 'data' and source.parent.name.startswith('.restore-') and source.parent.parent == root:
+                if source.name == 'data' and source.parent.name.startswith('.restore-') and (source.parent.parent == root or source.parent.parent.resolve() == root):
                     attempts.append(source)
                     if not handles:
                         # A legitimate reader of a restored file deliberately omits FILE_SHARE_DELETE.
@@ -86,7 +86,7 @@ class WindowsRestoreSharingTests(unittest.TestCase):
 
     def test_staging_identity_is_rechecked_after_contention(self):
         with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
+            root = Path(temporary).resolve()
             source, destination = root / 'stage', root / 'data'
             source.mkdir()
             denied = PermissionError(13, 'synthetic contention')

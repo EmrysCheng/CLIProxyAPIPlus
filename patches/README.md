@@ -34,3 +34,14 @@ adds no-drain observation throughout the wait and after ACK. All original
 registry, ACK, cancellation and blocking-scope assertions remain. No runtime
 retry, cancellation bound, Home behavior or original snapshot is changed; no
 test is skipped. Repeat and delayed-bad-drain mutation evidence is required.
+
+## Response interrupt fixture timing contract
+
+The unchanged v8.0.55 OpenAI responses interrupt fixture preimage
+`45b7d4a949dac4c04657176661b011606c5b0a6e1eb07e231e2ae02945f27f04`
+contains an immediate assertion on `executor.canceled.Load()` following
+client receipt of `response.incomplete`. Upstream stream goroutine cancellation
+via `<-ctx.Done()` and its `e.canceled.Store(true)` occurs asynchronously to
+the downstream websocket notification. The explicit test-only overlay uses a
+bounded 2-second polling wait before asserting upstream cancellation. No runtime
+logic or cancellation assertion is relaxed; no test is skipped.
