@@ -97,7 +97,7 @@ func resolveTools(ctx context.Context, config string) (Tools, ToolStatus) {
 			status.Missing = append(status.Missing, name)
 			return ""
 		}
-		timeout, cancel := context.WithTimeout(ctx, 4*time.Second)
+		timeout, cancel := context.WithTimeout(ctx, 20*time.Second)
 		defer cancel()
 		command := exec.CommandContext(timeout, path, args...)
 		command.Env = toolEnvironment(tools)

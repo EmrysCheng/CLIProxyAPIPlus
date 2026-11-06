@@ -7,6 +7,7 @@
 - Linux race 包级预算增加，保留测试、数据规模和断言；Windows 恢复仅对短暂文件占用进行有界等待。
 - 补充源码构建失败白名单诊断；更新 README 下载入口、平台选择、校验与解压说明。
 - 修复 CI 中 Windows 临时路径短名称比对异常与上游中断测试异步时序竞争。
+- 增加工具链版本探测超时时间，避免 Windows 冷启动 npm 偶发被误判为 missing。
 - 保留 v0.4.0 的源码发行事实；工程门禁不等于全部真实生产验收。
 
 ## [0.4.0](https://github.com/EmrysCheng/CLIProxyAPIPlus/releases/tag/v0.4.0) — 2026-11-06
