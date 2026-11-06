@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -73,6 +74,14 @@ func TestBaselineSourceBuildPipeline(t *testing.T) {
 	phases := []string{}
 	result, err := controller.build(context.Background(), webupdate.SourceRequest{Current: current, Targets: targets}, job, func(phase string) { phases = append(phases, phase); t.Log("source phase:", phase) })
 	if err != nil {
+		if rawLog, readErr := os.ReadFile(filepath.Join(job, "source-build.log")); readErr == nil {
+			if _, sourceFile, _, ok := runtime.Caller(0); ok {
+				goNames, pythonNames := knownDiagnosticTestNames(filepath.Clean(filepath.Join(filepath.Dir(sourceFile), "..", "..")))
+				summary := buildFailureDiagnostics(rawLog, goNames, pythonNames)
+				encoded, _ := json.Marshal(summary)
+				t.Logf("source-build failure diagnostics (source identifiers only): %s", encoded)
+			}
+		}
 		t.Fatal(err)
 	}
 	if result.Version != identity.Version || result.CoreCommit != expected["cliproxyapi"].Commit || result.ManagerCommit != expected["cpa-manager-plus"].Commit || result.SourceDigest != identity.Source {

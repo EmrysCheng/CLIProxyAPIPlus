@@ -10,13 +10,16 @@ def main():
  env.pop('GOOS',None);env.pop('GOARCH',None)
  if not a.race:env.setdefault('CGO_ENABLED','0')
  else:env['CGO_ENABLED']='1'
+ # Race instrumentation plus the full SQLite fixture exceeds Go's default 10-minute package budget.
+ # Keep each test's own assertions/deadlines unchanged; bound only the runner budget.
+ test_timeout='30m' if a.race else '20m'
  manager='github.com/seakee/cpa-manager-plus/apps/manager-server';core='github.com/router-for-me/CLIProxyAPI/v8'
  packages=[manager+'/internal/'+n for n in ['lifecycle','httpapi','service/proxy','service/collector','httpqueue','service/cpa','service/cpaauthfiles','service/managerconfig','repository/sqlite','store']]+[manager+'/pkg/embedded']+[core+'/internal/'+n for n in ['api','config','watcher']]+[core+'/sdk/cliproxy']
  if a.all_upstream:packages=[manager+'/...',core+'/...']
  def run(cmd):print('>',*cmd,flush=True);subprocess.run(cmd,cwd=project.ROOT,env=env,check=True)
  # Serial adapter gate limits timer jitter; full upstream mode retains normal concurrency.
- run([a.go,'test','-count=1',*([] if a.all_upstream else ['-p=1','-parallel=1']),*(['-race'] if a.race else []),*packages])
- if not a.all_upstream:run([a.go,'test','-count=1',manager+'/cmd/cpa-manager-plus','-run','TestWaitForBackfillReadiness|TestStopCodexInspectionWorker|TestServeHTTPServer|TestDerivedMigrationsStartAfterHTTPListenerIsBound|TestManagerDatabaseProcessLockPrecedesStoreOpen'])
+ run([a.go,'test','-count=1','-timeout',test_timeout,*([] if a.all_upstream else ['-p=1','-parallel=1']),*(['-race'] if a.race else []),*packages])
+ if not a.all_upstream:run([a.go,'test','-count=1','-timeout',test_timeout,manager+'/cmd/cpa-manager-plus','-run','TestWaitForBackfillReadiness|TestStopCodexInspectionWorker|TestServeHTTPServer|TestDerivedMigrationsStartAfterHTTPListenerIsBound|TestManagerDatabaseProcessLockPrecedesStoreOpen'])
  destination=project.BUILD/'regressions';destination.mkdir(parents=True,exist_ok=True)
  for name,pkg in [('core',core+'/cmd/server'),('manager',manager+'/cmd/cpa-manager-plus')]:run([a.go,'build','-buildvcs=false','-o',str(destination/(name+('.exe' if os.name=='nt' else ''))),pkg])
 if __name__=='__main__':
