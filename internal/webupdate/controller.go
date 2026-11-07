@@ -82,13 +82,15 @@ type Operation struct {
 }
 
 func publicOperation(op Operation) map[string]any {
-	message := ""
-	if op.Error != "" {
-		message = "Maintenance did not complete normally. Review the private transaction log for operation " + op.ID + "."
+	code := safeSourceCode(op.FailureCode)
+	if code == "" {
+		code = publicSourceCode(op)
 	}
-	code := publicSourceCode(op)
+	message := ""
 	if code != "" {
 		message = sourceFailureMessages[code]
+	} else if op.Error != "" {
+		message = "Maintenance did not complete normally. Review the private transaction log for operation " + op.ID + "."
 	}
 	return map[string]any{"failure_code": code, "progress": publicBuildProgress(op.Progress), "id": op.ID, "kind": op.Kind, "state": op.State, "from_version": op.FromVersion, "target_version": op.TargetVersion, "created_at": op.CreatedAt, "updated_at": op.UpdatedAt, "error": message, "rollback_available": op.RollbackAvailable, "from_upstreams": op.FromUpstreams, "target_upstreams": op.TargetUpstreams}
 }

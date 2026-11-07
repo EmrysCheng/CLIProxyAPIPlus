@@ -13,7 +13,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
+
+	manager "github.com/seakee/cpa-manager-plus/apps/manager-server/pkg/embedded"
 )
 
 var errChildStillAlive = errors.New("replacement exit could not be confirmed")
@@ -70,14 +73,29 @@ func clearMarker(o Options, id string) error {
 	return os.Remove(o.Data + ".maintenance")
 }
 func RunWorker(ctx context.Context, data, config, id string, recover bool) error {
+	logWorker := func(level, zh, en string, args ...any) {
+		ts := time.Now().UTC().Format(time.RFC3339)
+		zhText := fmt.Sprintf(zh, args...)
+		enText := fmt.Sprintf(en, args...)
+		msg := fmt.Sprintf("[%s] [%s] [zh: %s; en: %s]\n", ts, level, zhText, enText)
+		_, _ = os.Stdout.WriteString(msg)
+		_ = os.Stdout.Sync()
+	}
 	o := Options{Data: data, Config: config}
 	op, err := readOperation(o, id)
 	if err != nil {
+		logWorker("ERROR", "读取操作记录失败: %v", "Failed to read operation: %v", err)
 		return err
 	}
 	o = op.Options
 	if err = noLinks(o.operationDir(id)); err != nil {
+		logWorker("ERROR", "操作目录校验失败: %v", "Operation directory validation failed: %v", err)
 		return err
+	}
+	if recover {
+		logWorker("INFO", "启动离线维护/回滚恢复模式 (操作ID: %s)", "Starting offline maintenance/recovery mode (operation: %s)", id)
+	} else {
+		logWorker("INFO", "升级辅助进程已启动 (操作ID: %s, 目标版本: %s, 父进程PID: %d)", "Update helper started (operation: %s, target version: %s, parent PID: %d)", id, op.TargetVersion, op.ParentPID)
 	}
 	if recover && (op.State == "succeeded" || op.State == "rolled_back" || op.State == "failed") {
 		if errors.Is(ownedMarker(o.Data+".maintenance", id), os.ErrNotExist) {
@@ -88,88 +106,123 @@ func RunWorker(ctx context.Context, data, config, id string, recover bool) error
 	parentClean := false
 	if !recover {
 		if op.State != "awaiting_shutdown" || op.ParentPID < 1 {
+			logWorker("ERROR", "主服务未准备好交接，当前状态: %s", "Main service was not prepared for handover, current state: %s", op.State)
 			return errors.New("worker was not prepared by a running service")
 		}
 		if err = writeJSON(filepath.Join(o.operationDir(id), "worker-ready.json"), map[string]any{"pid": os.Getpid()}); err != nil {
+			logWorker("ERROR", "写入 worker-ready.json 失败: %v", "Failed to write worker-ready.json: %v", err)
 			return err
 		}
+		logWorker("INFO", "已通知主服务开始平滑停机，等待主进程退出 (PID: %d)", "Notified main service to start graceful shutdown, awaiting parent exit (PID: %d)", op.ParentPID)
 		wait, cancel := context.WithTimeout(ctx, 120*time.Second)
 		err = waitForParent(wait, op.ParentPID)
 		cancel()
 		if err != nil {
+			logWorker("ERROR", "等待主进程退出超时或异常: %v", "Waiting for parent process exit timed out or failed: %v", err)
 			return err
 		}
+		logWorker("INFO", "主进程已退出，检查平滑停止状态", "Parent process exited, verifying clean shutdown status")
 		var stopped struct {
 			PID int `json:"pid"`
 		}
 		parentClean = readJSON(filepath.Join(o.operationDir(id), "parent-stopped.json"), &stopped) == nil && stopped.PID == op.ParentPID
+		if !parentClean {
+			if lock, lockErr := manager.AcquireDataLock(o.Data); lockErr == nil {
+				_ = lock.Close()
+				parentClean = true
+				logWorker("INFO", "数据库排他锁已完全释放，主服务平滑停止确认成功", "Database lock is released, confirmed clean parent shutdown")
+			}
+		}
 	}
 	lock, err := acquireOperationLock(o)
 	if err != nil {
+		logWorker("ERROR", "获取操作排他锁失败: %v", "Failed to acquire operation lock: %v", err)
 		return err
 	}
 	defer lock.Close()
 	if err = ownedMarker(o.Data+".maintenance", id); err != nil {
+		logWorker("ERROR", "维护标记归属校验失败: %v", "Maintenance marker ownership check failed: %v", err)
 		return err
 	}
 	current, err := readOperation(o, id)
 	if err != nil {
+		logWorker("ERROR", "读取最新操作状态失败: %v", "Failed to read updated operation: %v", err)
 		return err
 	}
 	op = current
-	finish := func(state string, cause error) error {
+	finish := func(state string, cause error, code string) error {
 		op.State = state
+		if code != "" {
+			op.FailureCode = code
+		}
 		if cause != nil {
 			op.Error = cause.Error()
 		}
 		if e := saveOperation(&op); e != nil {
+			logWorker("ERROR", "保存操作状态失败: %v", "Failed to save operation state: %v", e)
 			return e
 		}
 		if state != "recovery_required" {
 			if e := clearMarker(o, id); e != nil {
+				logWorker("WARN", "清除维护标记失败: %v", "Failed to clear maintenance marker: %v", e)
 				return e
 			}
 		}
 		return cause
 	}
 	if !recover && !parentClean {
+		logWorker("WARN", "主服务未完成平滑下线，取消升级并启动原版本保持服务运行", "Original service did not complete clean shutdown, cancelling update and resuming original version")
 		cause := errors.New("original shutdown was not clean; update was not installed")
 		hash, e := fileHash(o.Binary)
 		if e != nil || hash != op.OriginalHash {
-			return finish("recovery_required", cause)
+			logWorker("ERROR", "原二进制文件校验失败，需要离线恢复: %v", "Original binary verification failed, recovery required: %v", e)
+			return finish("recovery_required", cause, "shutdown_not_clean")
 		}
 		if e = launch(ctx, &op, op.FromVersion, op.OriginalHash); e != nil {
-			return finish("recovery_required", errors.Join(cause, e))
+			logWorker("ERROR", "启动原版本失败，需要离线恢复: %v", "Failed to launch original version, recovery required: %v", e)
+			return finish("recovery_required", errors.Join(cause, e), "shutdown_not_clean")
 		}
-		return finish("failed", cause)
+		logWorker("INFO", "已安全恢复原版本运行", "Original version resumed safely")
+		return finish("failed", cause, "shutdown_not_clean")
 	}
 	if recover {
-		// Recovery is deliberately offline; the native DB lock in restore refuses to
-		// displace any running Manager. Restore the pre-operation pair, not a binary alone.
+		logWorker("INFO", "正在执行离线快照恢复与回滚", "Executing offline snapshot restoration and rollback")
 		if len(op.Snapshot) == 0 {
 			hash, e := fileHash(o.Binary)
 			if e != nil || hash != op.OriginalHash {
-				return finish("recovery_required", errors.New("no complete snapshot and original binary cannot be confirmed"))
+				logWorker("ERROR", "快照不完整且无法确认原二进制程序", "Incomplete snapshot and original binary cannot be confirmed")
+				return finish("recovery_required", errors.New("no complete snapshot and original binary cannot be confirmed"), "rollback_failed")
 			}
-			return finish("failed", nil)
+			return finish("failed", nil, "rollback_failed")
 		}
 		if err = restore(&op, op); err != nil {
-			return finish("recovery_required", err)
+			logWorker("ERROR", "离线恢复失败: %v", "Offline restoration failed: %v", err)
+			return finish("recovery_required", err, "rollback_failed")
 		}
-		return finish("rolled_back", nil)
+		logWorker("INFO", "离线恢复与回滚成功完成", "Offline restoration and rollback completed successfully")
+		return finish("rolled_back", nil, "")
 	}
 	op.State = "backing_up"
 	if err = saveOperation(&op); err != nil {
 		return err
 	}
+	logWorker("INFO", "开始创建升级前数据快照与备份", "Creating pre-update data snapshot and backup")
 	if err = snapshot(&op); err != nil {
+		logWorker("ERROR", "快照备份失败: %v", "Snapshot backup failed: %v", err)
 		cause := fmt.Errorf("backup failed before replacement: %w", err)
-		if e := launch(ctx, &op, op.FromVersion, op.OriginalHash); e != nil {
-			return finish("recovery_required", errors.Join(cause, e))
+		code := "backup_failed"
+		if strings.Contains(err.Error(), "database is not offline") {
+			code = "database_locked"
 		}
-		return finish("failed", cause)
+		if e := launch(ctx, &op, op.FromVersion, op.OriginalHash); e != nil {
+			logWorker("ERROR", "恢复原版本失败，需要离线恢复: %v", "Failed to resume original version, recovery required: %v", e)
+			return finish("recovery_required", errors.Join(cause, e), code)
+		}
+		return finish("failed", cause, code)
 	}
+	logWorker("INFO", "数据快照与备份创建成功", "Data snapshot and backup created successfully")
 	backup := op
+	code := ""
 	if op.Kind == "rollback" {
 		backup, err = readOperation(o, op.Reference)
 		if err == nil {
@@ -177,48 +230,86 @@ func RunWorker(ctx context.Context, data, config, id string, recover bool) error
 			err = saveOperation(&op)
 		}
 		if err == nil {
+			logWorker("INFO", "开始恢复回滚快照数据 (目标版本: %s, 引用操作: %s)", "Restoring rollback snapshot data (target version: %s, reference: %s)", backup.FromVersion, op.Reference)
 			err = restore(&op, backup)
+		}
+		if err != nil {
+			code = "rollback_failed"
+			logWorker("ERROR", "回滚快照恢复失败: %v", "Rollback snapshot restore failed: %v", err)
 		}
 	} else {
 		op.State = "installing"
 		err = saveOperation(&op)
 		if err == nil {
+			logWorker("INFO", "开始平滑替换二进制程序 (目标版本: %s)", "Starting smooth binary replacement (target version: %s)", op.TargetVersion)
 			err = replaceBinary(filepath.Join(o.operationDir(id), executableName()), o.Binary, op.TargetHash)
+		}
+		if err != nil {
+			code = "replace_binary_failed"
+			logWorker("ERROR", "二进制文件替换失败: %v", "Binary replacement failed: %v", err)
 		}
 	}
 	if err == nil {
 		op.State = "checking_data"
 		err = saveOperation(&op)
 		if err == nil {
+			logWorker("INFO", "执行离线数据完整性与迁移检查", "Running offline data integrity and migration check")
 			err = checkData(ctx, o)
+		}
+		if err != nil {
+			code = "check_data_failed"
+			logWorker("ERROR", "离线数据检查失败: %v", "Offline data check failed: %v", err)
 		}
 	}
 	if err == nil {
-		err = launch(ctx, &op, op.TargetVersion, op.TargetHash)
+		targetVer := op.TargetVersion
+		targetHash := op.TargetHash
+		if op.Kind == "rollback" {
+			targetVer = backup.FromVersion
+			targetHash = backup.OriginalHash
+		}
+		logWorker("INFO", "启动新程序并执行健康检查 (版本: %s)", "Launching replacement binary and verifying health (version: %s)", targetVer)
+		err = launch(ctx, &op, targetVer, targetHash)
+		if err != nil {
+			if strings.Contains(err.Error(), "exited before readiness") {
+				code = "replacement_exited"
+			} else {
+				code = "health_deadline_exceeded"
+			}
+			logWorker("ERROR", "新程序启动或健康检查失败: %v", "Replacement launch or health check failed: %v", err)
+		}
 	}
 	if err == nil {
 		state := "succeeded"
 		if op.Kind == "rollback" {
 			state = "rolled_back"
+			logWorker("INFO", "平滑回滚成功完成，目标版本已就绪运行", "Smooth rollback completed successfully, target version is ready and running")
+		} else {
+			logWorker("INFO", "平滑升级成功完成，新版本已就绪运行", "Smooth upgrade completed successfully, new version is ready and running")
 		}
-		return finish(state, nil)
+		return finish(state, nil, "")
 	}
-	// A failed install/rollback restores its own pre-operation snapshot. Failed
-	// candidate data are retained rather than deleted, including migration output.
+	logWorker("WARN", "升级安装未通过 (%v)，开始自动回滚至原版本快照", "Installation failed (%v), initiating automatic rollback to original version snapshot", err)
 	cause := err
 	if errors.Is(cause, errChildStillAlive) {
-		return finish("recovery_required", cause)
+		logWorker("ERROR", "替换子进程仍在运行，需要离线恢复", "Replacement child process is still alive, offline recovery required")
+		return finish("recovery_required", cause, code)
 	}
 	op.State = "restoring"
 	op.Error = cause.Error()
+	op.FailureCode = code
 	_ = saveOperation(&op)
 	if err = restore(&op, op); err != nil {
-		return finish("recovery_required", errors.Join(cause, err))
+		logWorker("ERROR", "恢复原版本快照失败，需要离线恢复: %v", "Failed to restore original version snapshot, recovery required: %v", err)
+		return finish("recovery_required", errors.Join(cause, err), "rollback_failed")
 	}
+	logWorker("INFO", "原版本数据与程序恢复完成，正在启动原版本", "Original data and binary restored, launching original version")
 	if err = launch(ctx, &op, op.FromVersion, op.OriginalHash); err != nil {
-		return finish("recovery_required", errors.Join(cause, err))
+		logWorker("ERROR", "启动原版本失败，需要离线恢复: %v", "Failed to launch original version, recovery required: %v", err)
+		return finish("recovery_required", errors.Join(cause, err), code)
 	}
-	return finish("rolled_back", cause)
+	logWorker("INFO", "原版本已成功启动并就绪，已安全回滚保持服务连续运行", "Original version launched and healthy, safely rolled back to maintain service continuity")
+	return finish("rolled_back", cause, code)
 }
 func checkData(ctx context.Context, o Options) error {
 	check, cancel := context.WithTimeout(ctx, 5*time.Minute)
@@ -253,64 +344,79 @@ func launch(ctx context.Context, op *Operation, version, hash string) error {
 		return err
 	}
 	args := append(restartArgs(*op, hash), "--web-update-activation", op.ID)
-	cmd := exec.Command(op.Options.Binary, args...)
-	detachProcess(cmd)
-	log, err := os.OpenFile(filepath.Join(op.Options.operationDir(op.ID), "application-console.log"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		return err
-	}
-	defer log.Close()
-	cmd.Stdout = log
-	cmd.Stderr = log
-	cmd.Dir = op.Options.WorkDir
-	if err = cmd.Start(); err != nil {
-		return err
-	}
-	done := make(chan error, 1)
-	go func() { done <- cmd.Wait() }()
-	healthy, cancel := context.WithTimeout(ctx, 90*time.Second)
-	defer cancel()
-	client, err := healthClient(op.Options)
-	if err == nil {
-		ticker := time.NewTicker(200 * time.Millisecond)
-		defer ticker.Stop()
-		consecutive := 0
-		for {
-			select {
-			case e := <-done:
-				return fmt.Errorf("replacement exited before readiness: %v", e)
-			case <-healthy.Done():
-				err = errors.New("replacement did not become healthy before the deadline")
-				goto failed
-			case <-ticker.C:
-				var ready struct {
-					PID  int    `json:"pid"`
-					Hash string `json:"binary_sha256"`
-				}
-				if readJSON(readyPath, &ready) != nil || ready.PID != cmd.Process.Pid || ready.Hash != hash {
-					continue
-				}
-				if healthCheck(healthy, client, op.Options.HealthURL, version) == nil {
-					consecutive++
-					if consecutive >= 3 {
-						return nil
+	var finalErr error
+	for attempt := 1; attempt <= 2; attempt++ {
+		if attempt > 1 {
+			time.Sleep(500 * time.Millisecond)
+		}
+		cmd := exec.Command(op.Options.Binary, args...)
+		detachProcess(cmd)
+		log, err := os.OpenFile(filepath.Join(op.Options.operationDir(op.ID), "application-console.log"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
+		if err != nil {
+			return err
+		}
+		defer log.Close()
+		cmd.Stdout = log
+		cmd.Stderr = log
+		cmd.Dir = op.Options.WorkDir
+		if err = cmd.Start(); err != nil {
+			return err
+		}
+		done := make(chan error, 1)
+		go func() { done <- cmd.Wait() }()
+		healthy, cancel := context.WithTimeout(ctx, 90*time.Second)
+		client, clientErr := healthClient(op.Options)
+		if clientErr == nil {
+			ticker := time.NewTicker(200 * time.Millisecond)
+			consecutive := 0
+			readyFound := false
+			for !readyFound {
+				select {
+				case e := <-done:
+					ticker.Stop()
+					cancel()
+					finalErr = fmt.Errorf("replacement exited before readiness: %v", e)
+					readyFound = true
+				case <-healthy.Done():
+					ticker.Stop()
+					cancel()
+					finalErr = errors.New("replacement did not become healthy before the deadline")
+					readyFound = true
+				case <-ticker.C:
+					var ready struct {
+						PID  int    `json:"pid"`
+						Hash string `json:"binary_sha256"`
 					}
-				} else {
-					consecutive = 0
+					if readJSON(readyPath, &ready) != nil || ready.PID != cmd.Process.Pid || ready.Hash != hash {
+						continue
+					}
+					if healthCheck(healthy, client, op.Options.HealthURL, version) == nil {
+						consecutive++
+						if consecutive >= 3 {
+							ticker.Stop()
+							cancel()
+							return nil
+						}
+					} else {
+						consecutive = 0
+					}
 				}
 			}
+		} else {
+			cancel()
+			finalErr = clientErr
+		}
+		_ = cmd.Process.Kill()
+		select {
+		case <-done:
+		case <-time.After(15 * time.Second):
+			return errors.Join(finalErr, errChildStillAlive)
+		}
+		if errors.Is(ctx.Err(), context.Canceled) || errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			break
 		}
 	}
-failed:
-	// Only terminate a replacement child started by this helper, never an
-	// administrator-selected PID. Wait for exit before restoring its SQLite files.
-	_ = cmd.Process.Kill()
-	select {
-	case <-done:
-	case <-time.After(15 * time.Second):
-		return errors.Join(err, errChildStillAlive)
-	}
-	return err
+	return finalErr
 }
 func healthClient(o Options) (*http.Client, error) {
 	transport := &http.Transport{Proxy: nil, DisableKeepAlives: true}

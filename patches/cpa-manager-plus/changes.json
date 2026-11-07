@@ -610,5 +610,16 @@
         "count": 1
       }
     ]
+  },
+  {
+    "path": "apps/web/src/features/accounts/model/accountQuotaWindowUsagePresentation.ts",
+    "sha256": "12db916348048bcba70c244c4c4bd762ac29abb4f7715897ddce6781dcfa777e",
+    "operations": [
+      {
+        "find": "  const currentUsageAheadOfQuotaProgressObservation =\n    hasReliableCurrentUsage &&\n    hasReliableQuotaProgress &&\n    quotaProgressObservedAtMs !== null &&\n    currentUsage.lastSeenMs !== null &&\n    currentUsage.lastSeenMs > quotaProgressObservedAtMs;\n  const currentForecastUsage =\n    hasReliableCurrentUsage &&\n    hasReliableQuotaProgress &&\n    quotaProgressObservedAtMs !== null &&\n    currentUsage.lastSeenMs !== null &&\n    currentUsage.lastSeenMs <= quotaProgressObservedAtMs\n      ? {\n          requests: currentUsage.totalRequests,\n          tokens: currentUsage.totalTokens,\n          cost: currentUsage.totalCost,\n        }\n      : null;",
+        "replace": "  const currentUsageAheadOfQuotaProgressObservation = false;\n  const currentForecastUsage =\n    hasReliableCurrentUsage &&\n    hasReliableQuotaProgress\n      ? {\n          requests: currentUsage.totalRequests,\n          tokens: currentUsage.totalTokens,\n          cost: currentUsage.totalCost,\n        }\n      : null;",
+        "count": 1
+      }
+    ]
   }
 ]

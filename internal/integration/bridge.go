@@ -145,7 +145,8 @@ func (b *Bridge) Middleware() gin.HandlerFunc {
 			return
 		}
 		if !b.enter() {
-			writeJSON(c.Writer, 503, gin.H{"error": "server is draining"})
+			c.Writer.Header().Set("Retry-After", "2")
+			writeJSON(c.Writer, 503, gin.H{"error": "server is restarting for update; please retry in a moment"})
 			c.Abort()
 			return
 		}

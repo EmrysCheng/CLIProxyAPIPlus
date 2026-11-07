@@ -306,8 +306,9 @@ func run(parent context.Context, args []string) (resultErr error) {
 	if *sourceUpdates {
 		updateOpts.Args = append(updateOpts.Args, "--source-updates", "--source-workspace", *sourceWorkspace, "--source-tools", *sourceTools)
 	}
+	var cleanShutdown bool
 	updates := webupdate.New(parent, updateOpts, releases, requestStop)
-	defer func() { updates.Close(resultErr == nil) }()
+	defer func() { updates.Close(cleanShutdown) }()
 	go releases.Run(parent, 6*time.Hour)
 	sources := sourceupdate.New(sourceupdate.Options{Enabled: *sourceUpdates && *webUpdates, Workspace: *sourceWorkspace, ToolsFile: *sourceTools, SourceDigest: SourceDigest, LockDigest: LockDigest, Version: Version, Current: map[string]webupdate.SourceTarget{"cliproxyapi": {Version: CoreVersion, Commit: CoreCommit}, "cpa-manager-plus": {Version: ManagerVersion, Commit: ManagerCommit}}}, updates)
 	go sources.Run(parent)
@@ -355,37 +356,42 @@ func run(parent context.Context, args []string) (resultErr error) {
 		managerExited = true
 	}
 	bridge.MarkCoreReady(false)
-	drain, cancelDrain := context.WithTimeout(context.Background(), 10*time.Second)
+	drain, cancelDrain := context.WithTimeout(context.Background(), 30*time.Second)
 	drainErr := bridge.Drain(drain)
 	cancelDrain()
 	stopManager()
 	managerDeadline := time.NewTimer(35 * time.Second)
 	defer managerDeadline.Stop()
+	var managerErr error
 	if !managerExited {
 		select {
-		case err := <-managerDone:
-			result = errors.Join(result, err)
+		case managerErr = <-managerDone:
+			result = errors.Join(result, managerErr)
 		case <-managerDeadline.C:
-			result = errors.Join(result, errors.New("Manager drain deadline exceeded"))
+			managerErr = errors.New("Manager drain deadline exceeded")
+			result = errors.Join(result, managerErr)
 		}
 	}
 	bridge.SetManager(nil)
 	stopCore()
 	coreDeadline := time.NewTimer(35 * time.Second)
 	defer coreDeadline.Stop()
+	var coreErr error
 	if !coreExited {
 		select {
-		case err := <-coreDone:
-			if !errors.Is(err, context.Canceled) {
-				result = errors.Join(result, err)
+		case coreErr = <-coreDone:
+			if !errors.Is(coreErr, context.Canceled) {
+				result = errors.Join(result, coreErr)
 			}
 		case <-coreDeadline.C:
-			result = errors.Join(result, errors.New("core drain deadline exceeded"))
+			coreErr = errors.New("core drain deadline exceeded")
+			result = errors.Join(result, coreErr)
 		}
 	}
 	if drainErr != nil {
 		result = errors.Join(result, fmt.Errorf("public requests did not drain before cancellation: %w", drainErr))
 	}
+	cleanShutdown = (managerErr == nil) && (coreErr == nil || errors.Is(coreErr, context.Canceled) || errors.Is(coreErr, http.ErrServerClosed))
 	return result
 
 }

@@ -61,7 +61,18 @@ var sourceFailureMessages = map[string]string{
 	"recipe_invalid":         "The source recipe does not match this program or failed integrity checks. Reinstall its matching updater-source directory.",
 	"source_cancelled":       "The source build was cancelled before installation.",
 	"source_timeout":         "The source build exceeded its time limit before installation. Check build resources and connectivity.",
-	"source_build_failed":    "The source build or compatibility checks failed before installation. Review the private source-build.log for this operation.",
+	"source_build_failed":     "The source build or compatibility checks failed before installation. Review the private source-build.log for this operation.",
+	"shutdown_timeout":        "The running service did not stop within the drain deadline. Retained running version to preserve continuity.",
+	"shutdown_not_clean":      "Original service did not complete smooth shutdown; cancelled update to avoid inconsistency and kept running version.",
+	"backup_failed":           "Data snapshot backup failed before replacement; cancelled update safely and resumed original program.",
+	"database_locked":         "Database is locked by another process; snapshot backup cannot proceed safely, update cancelled.",
+	"replace_binary_failed":   "Binary executable replacement failed; automatically rolled back and kept original service running.",
+	"check_data_failed":       "Offline data migration and integrity check failed; automatically restored original program and data snapshot.",
+	"replacement_exited":      "Replacement program exited unexpectedly after launch; automatically triggered rollback to original version.",
+	"health_deadline_exceeded": "Replacement program failed to pass health checks before deadline; automatically rolled back to original version.",
+	"rollback_failed":         "Rollback restoration failed; inspect local backup or perform offline recovery using the operation ID.",
+	"worker_handshake_failed": "Update helper process handshake timed out; original service continues running normally.",
+	"maintenance_failed":      "Maintenance did not complete normally. Review the private transaction log for this operation.",
 }
 
 func safeSourceCode(code string) string {

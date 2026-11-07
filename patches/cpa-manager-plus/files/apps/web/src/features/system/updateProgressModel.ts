@@ -29,6 +29,17 @@ export const failures: Record<string, [string, string]> = {
   source_cancelled: ['构建已取消，尚未安装。', 'The build was cancelled before installation.'],
   source_timeout: ['构建超时，尚未安装。请检查网络、CPU 和磁盘空间。', 'The build timed out before installation. Check network access, CPU and disk space.'],
   source_build_failed: ['构建或兼容性验证未通过，尚未安装。请按操作编号查看本地私有构建日志。', 'The build or compatibility validation failed before installation. Inspect the private local build log using the operation ID.'],
+  shutdown_timeout: ['原服务停止请求超时，为保障服务连续性已保留原版本继续运行。', 'The running service did not stop within the drain deadline. Retained running version to preserve continuity.'],
+  shutdown_not_clean: ['原服务未完成平滑下线，为避免数据不一致已取消升级并继续运行原版本。', 'Original service did not complete smooth shutdown; cancelled update to avoid inconsistency and kept running version.'],
+  backup_failed: ['升级前数据快照备份失败，已安全取消替换并恢复运行原程序。', 'Data snapshot backup failed before replacement; cancelled update safely and resumed original program.'],
+  database_locked: ['数据库仍被占用，快照备份无法安全进行，已取消升级并继续运行原版本。', 'Database is locked by another process; snapshot backup cannot proceed safely, update cancelled.'],
+  replace_binary_failed: ['二进制可执行文件替换失败，已自动回滚并保持原服务正常运行。', 'Binary executable replacement failed; automatically rolled back and kept original service running.'],
+  check_data_failed: ['离线数据迁移与完整性校验未通过，已自动恢复原程序与数据快照。', 'Offline data migration and integrity check failed; automatically restored original program and data snapshot.'],
+  replacement_exited: ['新版本程序启动后异常退出，已自动触发安全回滚并恢复原版本。', 'Replacement program exited unexpectedly after launch; automatically triggered rollback to original version.'],
+  health_deadline_exceeded: ['新版本程序未在规定时间内通过健康检查，已自动安全回滚至原版本。', 'Replacement program failed to pass health checks before deadline; automatically rolled back to original version.'],
+  rollback_failed: ['回滚快照恢复失败，请根据操作编号检查本地备份或执行离线恢复。', 'Rollback restoration failed; inspect local backup or perform offline recovery using the operation ID.'],
+  worker_handshake_failed: ['升级辅助进程启动握手超时，原服务继续正常运行。', 'Update helper process handshake timed out; original service continues running normally.'],
+  maintenance_failed: ['升级维护过程未正常完成，请查看该操作对应的私有事务日志。', 'Maintenance did not complete normally. Review the private transaction log for this operation.'],
 };
 
 export function duration(start: string | undefined, end: number) {
