@@ -217,7 +217,7 @@ def package(destination, target, source=None):
         'Go/Node 采用官方可再分发归档，Python 采用 Astral python-build-standalone。\n'
         '每份 SDK 的 LICENSE、NOTICE、share/licenses 等原始文件均保留在 build-tools 下。\n'
         'archive SHA256、来源、目标平台见 updater-source/internal/sourceupdate/toolchains.lock.json；'
-        '逐文件 SHA256、版本与权限见 build-tools/toolchain-manifest.json。\n', encoding='utf-8')
+        '逐文件 SHA256、版本与权限见 build-tools/toolchain-manifest.json。\n', encoding='utf-8', newline='\n')
     return {'build-tools/' + name for name in data['executables']}
 
 
